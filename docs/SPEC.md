@@ -11,7 +11,7 @@
 | Science, Years 7 and 8 | One Science report run per year group. Both supplied exports have one Science results column per term. |
 | Science, Year 9 | One SIMS export contains Biology, Physics and Chemistry. Process that same export in three separate runs, one per subject, with its own term bindings and report records. |
 | Sex and teacher | `Sex` has been added to all relevant SIMS marksheets. The class teacher completes the teacher field on the issued Word document. |
-| LAC | A blank value in the `Looked After` column means No. The Art marksheet change has been requested and awaits confirmation. |
+| LAC | A blank value in the `Looked After` column means No. The Art marksheet now includes `Looked After`. |
 | Word layout | Use the supplied template. Preserve its headings, including the percentage-band labels. Agree what the band and average cells represent before binding them to live merge fields. |
 
 ### Science term headers
@@ -48,7 +48,7 @@ Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam%
 | Five named quintile lists at the top | Candidate source is Prior Attainment Quintile. Confirm before binding those fields. |
 | Percentage-band cells | Ask what the original labels are intended to describe and what goes in each cell. Calculate Q1–Q5 counts in Excel for verification. Leave these Word cells unbound until the intended mapping is confirmed. |
 | Class average and year average | Confirm what they should measure with quintile inputs. If a mean quintile is wanted, use valid pupil results and weight the year figure by pupil, with the intended subject cohort confirmed. A partial export cannot stand in for the full cohort. |
-| Flag codes | Check the populated LAC codes and the PP flag convention against the standard SIMS export. Confirm that Art includes `Looked After` when the updated marksheet is available. |
+| Flag codes | Check the populated LAC codes and the PP flag convention against the standard SIMS export. |
 | Intervention and evaluation boxes | Use teacher entry for the initial release unless there is an agreed automated field definition. |
 
 These decisions allow development of the import, validation, class profile, internal quintile counts and initial Word pilot with confirmed fields. Resolve any fields required for the first live report before binding and releasing that report.
