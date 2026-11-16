@@ -29,9 +29,11 @@
 
    The teacher, top quintile lists, percentage bands, averages and intervention/evaluation boxes can remain blank for this pilot.
 
-4. Preview both records, then choose **Finish & Merge → Edit Individual Documents**. Verify that each record shows the correct class and names. Record the page count and any split rows at the intended paper size. Close Word before resetting or changing the source. After a failed or cancelled refresh, complete a successful current refresh before merging.
+4. In desktop Word, preview both records (`7SYN/A` and `7SYN/B`), then choose **Finish & Merge → Edit Individual Documents** for both. Check all six list fields against the expected results below: names must be sorted, with one pupil per line inside the appropriate cell, including both Boys and Girls names in class A. Check that blank lists remain blank, no names cross between classes, and the supplied template headings are unchanged. Inspect both merged records at the intended paper size and record the page count, any clipped names, split rows or page overflow. Close Word before resetting or changing the source. After a failed or cancelled refresh, complete a successful current refresh before merging.
 
 ## Expected results
+
+SEND K, EHCP, Boys, Girls, PP and LAC all use the shared `NameList` helper. It sorts pupil names and joins them with a line feed (`#(lf)`), matching KS4. The line breaks shown in the table below mean one pupil per line in the merged Word cell.
 
 | Check | 7SYN/A | 7SYN/B |
 | --- | --- | --- |
@@ -42,8 +44,8 @@
 | Summer Q1–Q5 | 0, 0, 1, 0, 1 | 0, 2, 0, 0, 0 |
 | SEND K | Test Pupil 01 | Test Pupil 06 |
 | EHCP | Test Pupil 02 | blank |
-| Boys | Test Pupil 01, Test Pupil 04 | Test Pupil 07 |
-| Girls | Test Pupil 02, Test Pupil 03 | Test Pupil 06 |
+| Boys | Test Pupil 01<br>Test Pupil 04 | Test Pupil 07 |
+| Girls | Test Pupil 02<br>Test Pupil 03 | Test Pupil 06 |
 | PP | Test Pupil 01 | Test Pupil 06 |
 | LAC | Test Pupil 02 | blank |
 
@@ -51,6 +53,7 @@ Expect one row without a class, one unclassified sex and three unknown PP values
 
 ## Follow-up checks
 
+- For a longer-list desktop Word check, extend a local copy of the synthetic export to a 32-pupil class with long names and multiple pupils in each of SEND K, EHCP, Boys, Girls, PP and LAC. Keep the source names out of order so the sorted output can be checked. Process, refresh, review and save, then preview and merge in desktop Word at the intended paper size. Confirm one pupil per line in all six list cells and check that the report fits on one page with no clipped names, split rows or page overflow. Record the page count and any overflow or layout issue for correction before release; keep the merge field names and supplied template headings unchanged.
 - Reset after a successful refresh. Check **NOT READY**, refresh to empty the query output, then stage only class B and verify that a new refresh returns one record.
 - Trigger a failed run by removing the Autumn heading and its whole column. The query should show a missing Autumn column message, and the previous run must not show as ready.
 - Change one valid mark to 6. The affected term's invalid count should increase by one and its assessed count should decrease by one. Remove the whole LAC column and verify the output reports **Unavailable**.

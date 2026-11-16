@@ -85,7 +85,7 @@ let
                 else Pupils,
 
             NameList = (pupils as table, predicate as function) as text =>
-                Text.Combine(List.Sort(Table.SelectRows(pupils, predicate)[Pupil]), ", "),
+                Text.Combine(List.Sort(Table.SelectRows(pupils, predicate)[Pupil]), "#(lf)"),
             Grouped = Table.Group(RequireNames, {"Class"}, {{"Members", each _, type table}}),
             Rows = List.Transform(Table.ToRecords(Grouped), (group) =>
                 let
