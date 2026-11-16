@@ -8,11 +8,21 @@
 | Operator screen | Follow the KS4 layout with the `Paste_SIMS` sheet, A3 paste point, Help, Process Pupil Data, Reset and clear status feedback. |
 | Run scope | One year group and one subject per run. Produce one report record per teaching class for the selected subject. |
 | Attainment | Current-year Autumn, Spring and Summer results are quintiles from 1 to 5, with 1 highest. Several current SIMS headings mention percentages or exams. Preserve the source headings and bind them to the correct term. |
-| Science, Years 7 and 8 | One Science report run per year group. The Year 8 export shows one Science results column per term. Check the exact Year 7 aliases when its export is available. |
+| Science, Years 7 and 8 | One Science report run per year group. Both supplied exports have one Science results column per term. |
 | Science, Year 9 | One SIMS export contains Biology, Physics and Chemistry. Process that same export in three separate runs, one per subject, with its own term bindings and report records. |
 | Sex and teacher | The standard SIMS marksheets will include `Sex`. The class teacher completes the teacher field on the issued Word document. |
 | LAC | Add the LAC column to the Art marksheet. The meaning of a blank LAC value awaits confirmation. |
 | Word layout | Use the supplied template. Preserve its headings, including the percentage-band labels. Agree what the band and average cells represent before binding them to live merge fields. |
+
+### Science term headers
+
+| Term | Year 7 | Year 8 |
+| --- | --- | --- |
+| Autumn | `SC Exam Y7 (%) Au Year 7 Autumn` | `SC Exam Y8 (%)~2 Year 8 Autumn` |
+| Spring | `SC Exam Y7 (%) Sp Year 7 Spring` | `SC Exam Y8 (%)~3 Year 8 Spring` |
+| Summer | `SC Exam Y7 (%) Su Year 7 Summer` | `SC Exam Y8 (%)~4 Year 8 Summer` |
+
+Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam% Year 7 Summer`, `Prior Attainment Qiunti E Year 7 Summer` and `SC End of Year Quintile Year 7` distinct. The baseline quintile column in both exports is headed `Prior Attainment Qiuntine`.
 
 ## Workbook design
 
