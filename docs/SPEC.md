@@ -10,8 +10,8 @@
 | Attainment | Current-year Autumn, Spring and Summer results are quintiles from 1 to 5, with 1 highest. Several current SIMS headings mention percentages or exams. Preserve the source headings and bind them to the correct term. |
 | Science, Years 7 and 8 | One Science report run per year group. Both supplied exports have one Science results column per term. |
 | Science, Year 9 | One SIMS export contains Biology, Physics and Chemistry. Process that same export in three separate runs, one per subject, with its own term bindings and report records. |
-| Sex and teacher | The standard SIMS marksheets will include `Sex`. The class teacher completes the teacher field on the issued Word document. |
-| LAC | Add the LAC column to the Art marksheet. The meaning of a blank LAC value awaits confirmation. |
+| Sex and teacher | `Sex` has been added to all relevant SIMS marksheets. The class teacher completes the teacher field on the issued Word document. |
+| LAC | A blank value in the `Looked After` column means No. The Art marksheet change has been requested and awaits confirmation. |
 | Word layout | Use the supplied template. Preserve its headings, including the percentage-band labels. Agree what the band and average cells represent before binding them to live merge fields. |
 
 ### Science term headers
@@ -38,7 +38,7 @@ Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam%
 - A valid mark is an integer from 1 to 5, including the equivalent text form after trimming. A blank is unassessed. Flag out-of-range values or unexpected text for correction. Count only valid marks in the relevant class, subject and term. Keep the assessed count alongside the five counts so a genuinely unassessed term can be recognised.
 - Use the same-year term field. Keep the separate end-of-year exam and prior-year quintile available as distinct inputs where present. Their use in reporting depends on an agreed field definition.
 - Use the pupil names supplied by SIMS for approved name lists. Use stable identifiers for duplicate diagnostics where available. Keep distinct pupils who share the same name and avoid joining different subjects' exports for release 1.
-- Keep SEND K and EHCP distinct. Use the supplied `Sex` values for the Boys and Girls groups and surface blanks or unexpected values as unclassified. Handle a missing or blank PP/LAC value without a refresh error. Until the SIMS flag convention is confirmed, distinguish an unknown value from a confirmed negative.
+- Keep SEND K and EHCP distinct. Use the supplied `Sex` values for the Boys and Girls groups and surface blanks or unexpected values as unclassified. For LAC, treat a blank cell in a present `Looked After` column as No. If the column is missing, report LAC as unavailable. Handle blank or missing PP without a refresh error and preserve it as unknown until the PP convention is confirmed.
 - Use a single publication row per teaching class in the current subject run. Keep the profile fields and term metrics separate so confirming a Word field changes only its mapping. Keep test evidence and public examples synthetic.
 
 ## Decisions to confirm during the pilot
@@ -48,7 +48,7 @@ Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam%
 | Five named quintile lists at the top | Candidate source is Prior Attainment Quintile. Confirm before binding those fields. |
 | Percentage-band cells | Ask what the original labels are intended to describe and what goes in each cell. Calculate Q1–Q5 counts in Excel for verification. Leave these Word cells unbound until the intended mapping is confirmed. |
 | Class average and year average | Confirm what they should measure with quintile inputs. If a mean quintile is wanted, use valid pupil results and weight the year figure by pupil, with the intended subject cohort confirmed. A partial export cannot stand in for the full cohort. |
-| LAC and PP flags | Verify the meaning of blank and the explicit positive/negative codes using the standard export. |
+| Flag codes | Check the populated LAC codes and the PP flag convention against the standard SIMS export. Confirm that Art includes `Looked After` when the updated marksheet is available. |
 | Intervention and evaluation boxes | Use teacher entry for the initial release unless there is an agreed automated field definition. |
 
 These decisions allow development of the import, validation, class profile, internal quintile counts and initial Word pilot with confirmed fields. Resolve any fields required for the first live report before binding and releasing that report.
