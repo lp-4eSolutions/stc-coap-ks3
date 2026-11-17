@@ -4,7 +4,12 @@ let
         if value = null then "" else Text.Trim(Text.Replace(Text.From(value), Character.FromNumber(160), " ")),
     HeaderKey = (value as text) as text =>
         Text.Remove(Text.Upper(CleanText(value)), {" ", "#(tab)"}),
-    RunID = CleanText(Table.ToRows(Source{[Name = "KS3_CurrentRun"]}[Content]){0}{0}),
+    Cell = (name as text) as any => Table.ToRows(Source{[Name = name]}[Content]){0}{0},
+    RunID = CleanText(Cell("KS3_CurrentRun")),
+    Selection = CleanText(Cell("KS3_SubjectSelection")),
+    StagedSelection = CleanText(Cell("KS3_StagedSelection")),
+    StagedSubject = CleanText(Cell("KS3_StagedSubject")),
+    StagedYear = Cell("KS3_StagedYear"),
 
     Terms = {"Autumn", "Spring", "Summer"},
     Quintiles = {1..5},
@@ -15,35 +20,45 @@ let
     ProfileNames = {"Subject_Class", "SEND_K_List", "EHCP_List", "Boys_List", "Girls_List", "PP_List", "LAC_List"},
     CountNames = {"Pupils", "Sex_Unclassified", "PP_Unknown", "LAC_Unknown", "Rows_Without_Class"},
     OutputTypes = List.Transform(
-        ProfileNames & {"Class", "Subject", "RunID", "LAC_Column_Status"}, (name) => {name, type text}
+        ProfileNames & {"Class", "Subject", "RunID", "SelectionToken", "LAC_Column_Status"}, (name) => {name, type text}
     ) & List.Transform({"Year_Group"} & CountNames & MetricNames, (name) => {name, Int64.Type}),
     OutputNames = List.Transform(OutputTypes, (column) => column{0}),
 
-    Bindings = {
-        {"Pupil", true, {"Surname Forename"}},
-        {"Class", true, {"Class"}},
-        {"SEN", false, {"SEN Status"}},
-        {"Sex", false, {"Sex"}},
-        {"PP", false, {"Pupil Premium Indicator"}},
-        {"LAC", false, {"Looked After"}},
-        {"Autumn", true, {"EN Attainment Y7 (%) Year 7 Autumn"}},
-        {"Spring", true, {"EN Attainment Y7 (%)~2 Year 7 Spring", "EN Attainment Y7 (%) Year 7 Spring"}},
-        {"Summer", true, {"EN Attainment Y7 (%)Su Year 7 Summer", "EN Attainment Y7 (%) Year 7 Summer"}}
-    },
+    // BEGIN GENERATED BINDINGS
+    ProfileBindings = {{"Pupil", true, {"Surname Forename"}}, {"Class", true, {"Class"}}, {"SEN", false, {"SEN Status"}}, {"Sex", false, {"Sex"}}, {"PP", false, {"Pupil Premium Indicator"}}, {"LAC", false, {"Looked After"}}},
+    Layouts = {{"year-7-art", 7, {{"Art", {{"Art Attainment Yr7 (%) Year 7 Autumn"}, {"AR AttainmentY7 (%) Sp Year 7 Spring"}, {"AR Attainment Y7(%) Su Year 7 Summer"}}}}}, {"year-7-english", 7, {{"English", {{"EN Attainment Y7 (%) Year 7 Autumn"}, {"EN Attainment Y7 (%)~2 Year 7 Spring", "EN Attainment Y7 (%) Year 7 Spring"}, {"EN Attainment Y7 (%)Su Year 7 Summer", "EN Attainment Y7 (%) Year 7 Summer"}}}}}, {"year-7-science", 7, {{"Science", {{"SC Exam Y7 (%) Au Year 7 Autumn"}, {"SC Exam Y7 (%) Sp Year 7 Spring"}, {"SC Exam Y7 (%) Su Year 7 Summer"}}}}}, {"year-8-french", 8, {{"French", {{"FR Attainment Y8 (%) Au Year 8 Autumn"}, {"FR Attainment Y8 (%) Sp Year 8 Spring"}, {"FR AttainmentY8 (%) Su Year 8 Summer"}}}}}, {"year-8-maths", 8, {{"Maths", {{"MA Attainment Y8 (%)Au Year 8 Autumn"}, {"MA Attainment Y8(%)Sp Year 8 Spring"}, {"MA AttainmentY8 (%)Su Year 8 Summer"}}}}}, {"year-8-science", 8, {{"Science", {{"SC Exam Y8 (%)~2 Year 8 Autumn"}, {"SC Exam Y8 (%)~3 Year 8 Spring"}, {"SC Exam Y8 (%)~4 Year 8 Summer"}}}}}, {"year-9-dt", 9, {{"DT", {{"TECH Attainment Y9 (%)~3 Year 9 Autumn"}, {"TECH Attainment Y9 (%)~2 Year 9 Spring"}, {"TECH Attainment Y9 (%) Year 9 Summer"}}}}}, {"year-9-science", 9, {{"Biology", {{"BI Attainment Y9 (%) Year 9 Autumn"}, {"BI Attainment Y9 (%) Sp Year 9 Spring"}, {"BI Attainment Y9 (%)~3 Year 9 Summer"}}}, {"Physics", {{"PH Attainment Y9 (%) Year 9 Autumn"}, {"PH Attainment Y9 (%) Sp Year 9 Spring"}, {"PH Attainment Y9 (%)~3 Year 9 Summer"}}}, {"Chemistry", {{"CH Attainment Y9 (%) Year 9 Autumn"}, {"CH Attainment Y9 (%) Sp Year 9 Spring"}, {"CH Attainment Y9 (%)~3 Year 9 Summer"}}}}}},
+    // END GENERATED BINDINGS
 
     Build = () as table =>
         let
             Raw = Source{[Name = "SIMS_Raw"]}[Content],
             Headers = Table.ColumnNames(Raw),
             Keys = List.Transform(Headers, HeaderKey),
+            HasAlias = (aliases as list) as logical =>
+                List.AnyTrue(List.Transform(aliases, each List.Contains(Keys, HeaderKey(_)))),
+            // Match any current term, so a partially missing layout gets a useful term error.
+            // Prior-year, effort and end-of-year exam columns never identify the current run.
+            Candidates = List.Select(Layouts, (layout) => List.AnyTrue(List.Transform(layout{2},
+                (subject) => List.AnyTrue(List.Transform(subject{1}, HasAlias))))),
+            Layout = if List.Count(Candidates) = 1 then Candidates{0}
+                else if List.IsEmpty(Candidates) then error "No supported year/subject headers found."
+                else error "Ambiguous year/subject headers: paste one SIMS layout only.",
+            SubjectCandidates = if List.Count(Layout{2}) = 1 then Layout{2}
+                else List.Select(Layout{2}, each _{0} = Selection),
+            SubjectBinding = if List.Count(SubjectCandidates) = 1 then SubjectCandidates{0}
+                else error "Year 9 Science: choose Biology, Physics or Chemistry and Process again.",
+            Year = Layout{1},
+            Subject = SubjectBinding{0},
+            Bindings = ProfileBindings & List.Transform(List.Positions(Terms), (i) =>
+                {Terms{i}, true, SubjectBinding{1}{i}}),
             Resolve = (binding as list) as nullable text =>
                 let
                     AliasKeys = List.Transform(binding{2}, HeaderKey),
                     Matches = List.Select(List.Positions(Keys), (position) => List.Contains(AliasKeys, Keys{position}))
                 in
-                    if List.Count(Matches) > 1 then error ("Multiple Year 7 English columns match " & binding{0} & ".")
+                    if List.Count(Matches) > 1 then error ("Multiple columns match " & binding{0} & ".")
                     else if List.IsEmpty(Matches) then
-                        if binding{1} then error ("The Year 7 English export is missing the " & binding{0} & " column.")
+                        if binding{1} then error ("Missing " & binding{0} & " column for Year " & Text.From(Year) & " " & Subject & ".")
                         else null
                     else Headers{Matches{0}},
 
@@ -99,7 +114,7 @@ let
                             {List.Sum(Counts), Invalid} & Counts
                     )),
                     Profile = [
-                        Subject_Class = "English / " & group[Class],
+                        Subject_Class = Subject & " / " & group[Class],
                         SEND_K_List = NameList(Members, each [SEN] = "K"),
                         EHCP_List = NameList(Members, each [SEN] = "E"),
                         Boys_List = NameList(Members, each List.Contains({"M", "MALE"}, [Sex])),
@@ -107,8 +122,9 @@ let
                         PP_List = NameList(Members, each [PP] = true),
                         LAC_List = if HasLAC then NameList(Members, each [LAC] = true) else "Unavailable",
                         Class = group[Class],
-                        Subject = "English",
-                        Year_Group = 7,
+                        Subject = Subject,
+                        Year_Group = Year,
+                        SelectionToken = Selection,
                         RunID = RunID,
                         Pupils = Table.RowCount(Members),
                         Sex_Unclassified = Table.RowCount(Table.SelectRows(Members, each not List.Contains({"M", "MALE", "F", "FEMALE"}, [Sex]))),
@@ -121,7 +137,9 @@ let
                     Record.Combine({Profile, Record.FromList(Metrics, MetricNames)})
             )
         in
-            Table.Sort(Table.FromRecords(Rows, OutputNames), {{"Class", Order.Ascending}}),
+            if Selection <> StagedSelection or Subject <> StagedSubject or Year <> StagedYear then
+                error "Run selection changed. Process Pupil Data again before refreshing."
+            else Table.Sort(Table.FromRecords(Rows, OutputNames), {{"Class", Order.Ascending}}),
 
     Output = if RunID = "" then #table(OutputNames, {}) else Build()
 in

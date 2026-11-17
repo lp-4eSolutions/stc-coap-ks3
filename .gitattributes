@@ -1,0 +1,2 @@
+# Empty trailing fields are significant tab delimiters in the synthetic exports.
+tests/*.tsv whitespace=-blank-at-eol

@@ -1,0 +1,13 @@
+{
+  "name": "stc-coap-ks3",
+  "private": true,
+  "scripts": {
+    "generate": "node scripts/generate-bindings.mjs",
+    "test": "node scripts/generate-bindings.mjs --check && node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@microsoft/powerquery-parser": "0.19.0",
+    "hyperformula": "3.1.0",
+    "typescript": "5.9.3"
+  }
+}

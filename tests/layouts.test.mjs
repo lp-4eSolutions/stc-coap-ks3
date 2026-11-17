@@ -1,0 +1,236 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+import { TaskUtils, DefaultSettings } from '@microsoft/powerquery-parser';
+import { Workbook, fixture, installed, read, script } from './support/workbook.mjs';
+import { config, expected, key, terms } from './support/reference.mjs';
+
+const process = script('process-pupil-data'), reset = script('reset'), select = script('select-subject');
+const counts = (row,term) => [1,2,3,4,5].map(q => row[`${term}_Q${q}`]);
+function refreshModel(book) { book.output = expected(book.raw(), book.cell('KS3_SubjectSelection'), book.cell('KS3_CurrentRun')); }
+function clearPaste(book) {
+  const sheet = book.getWorksheet('Paste_SIMS'), used = sheet.getUsedRange();
+  if (used && used.getRowCount() > 2) sheet.getRangeByIndexes(2,0,used.getRowCount()-2,used.getColumnCount()).clear();
+}
+
+test('all six standalone Office Scripts parse as TypeScript', () => {
+  const files = fs.readdirSync('office-scripts').filter(n => n.endsWith('.ts'));
+  assert.equal(files.length,6);
+  for (const name of files) script(name.slice(0,-3));
+});
+test('production Power Query parses with the Microsoft M parser', async () => {
+  const result = await TaskUtils.tryLexParse(DefaultSettings, read('power-query/KS3_Merge_Final.pq'));
+  assert.equal(result.resultKind, 'Ok', result.error?.message);
+});
+
+test('map covers exactly the eight requested layouts', () => {
+  assert.deepEqual(config.layouts.map(l => l.id), ['year-7-art','year-7-english','year-7-science','year-8-french','year-8-maths','year-8-science','year-9-dt','year-9-science']);
+});
+for (const layout of config.layouts) {
+  for (const subject of layout.subjects) {
+    test(`${layout.id} / ${subject.subject}: actual Process resolves and stages; reference counts and readiness`, () => {
+      const book = installed(), grid = fixture(layout.id);
+      const choice = layout.subjects.length > 1 ? subject.subject : 'Auto';
+      select(book,choice); book.paste(grid); process(book);
+      assert.equal(book.cell('KS3_StagedYear'),layout.year);
+      assert.equal(book.cell('KS3_StagedSubject'),subject.subject);
+      assert.deepEqual(book.raw(),grid.map(row => row.map((value,i) => i < grid[0].length ? value.replace(/\u00a0/g,' ').trim() : value)));
+      assert.equal(book.ready(),'REFRESH REQUIRED');
+      refreshModel(book);
+      assert.equal(book.ready(),`READY TO REVIEW: Year ${layout.year} ${subject.subject} / 2 class(es)`);
+      const [a,b] = book.output;
+      assert.equal(a.Subject_Class,`${subject.subject} / ${layout.year}SYN/A`);
+      assert.equal(a.Pupils,5); assert.equal(b.Pupils,2); assert.equal(a.Rows_Without_Class,1);
+      assert.equal(a.SEND_K_List,'Test Pupil 01'); assert.equal(a.EHCP_List,'Test Pupil 02');
+      assert.equal(b.SEND_K_List,'Test Pupil 06');
+      if (layout.id === 'year-9-science') {
+        const quintiles = {Biology:[1,2,3],Physics:[2,3,4],Chemistry:[5,4,1]}[subject.subject];
+        terms.forEach((term,t) => {
+          assert.equal(a[term+'_Assessed'],4);
+          assert.deepEqual(counts(a,term),[1,2,3,4,5].map(q => q === quintiles[t] ? 4 : 0));
+          assert.equal(b[term+'_Assessed'],2);
+          assert.deepEqual(counts(b,term),[1,2,3,4,5].map(q => q === quintiles[t] ? 2 : 0));
+        });
+      } else {
+        assert.deepEqual(counts(a,'Autumn'),[1,2,0,0,1]);
+        assert.equal(a.Spring_Assessed,0);
+        assert.deepEqual(counts(a,'Summer'),[0,0,1,0,1]);
+        assert.deepEqual(counts(b,'Summer'),[0,2,0,0,0]);
+      }
+      if (layout.id === 'year-7-art') {
+        assert.equal(a.LAC_Column_Status,'Unavailable'); assert.equal(a.LAC_Unknown,5);
+      } else { assert.equal(a.LAC_List,'Test Pupil 02'); assert.equal(a.LAC_Unknown,0); }
+      if (['year-7-art','year-8-french','year-8-maths','year-9-dt','year-9-science'].includes(layout.id)) {
+        assert.equal(a.Sex_Unclassified,5); assert.equal(a.Boys_List,'');
+      } else {
+        assert.equal(a.Boys_List,'Test Pupil 01\nTest Pupil 04');
+        assert.equal(a.Girls_List,'Test Pupil 02\nTest Pupil 03');
+      }
+    });
+  }
+}
+
+test('same Year 9 paste, three selections, changing away and back never revives a run', () => {
+  const book = installed(); book.paste(fixture('year-9-science'));
+  let lastRun;
+  for (const subject of ['Biology','Physics','Chemistry','Biology']) {
+    select(book,subject);
+    assert.equal(book.cell('KS3_CurrentRun'),''); assert.equal(book.ready(),'NOT READY');
+    process(book); assert.notEqual(book.cell('KS3_CurrentRun'),lastRun);
+    assert.equal(book.ready(),'REFRESH REQUIRED');
+    refreshModel(book); assert.match(book.ready(),new RegExp(subject));
+    assert.equal(book.output[0].Subject,subject); lastRun = book.cell('KS3_CurrentRun');
+  }
+  select(book,'Biology'); assert.equal(book.ready(),'NOT READY');
+});
+test('direct selection change immediately fails the installed readiness formula', () => {
+  const book = installed(); select(book,'Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
+  book.cell('KS3_SubjectSelection','Physics'); assert.equal(book.ready(),'PROCESS REQUIRED');
+});
+test('a failed or cancelled refresh retains old rows but cannot mark the new run ready', () => {
+  const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
+  const oldOutput = book.output, previousRun = book.cell('KS3_CurrentRun');
+  process(book); assert.notEqual(book.cell('KS3_CurrentRun'),previousRun);
+  // Simulate no query-table write after failure/cancellation.
+  assert.equal(book.output,oldOutput); assert.equal(book.ready(),'REFRESH REQUIRED');
+  refreshModel(book); assert.match(book.ready(),/^READY TO REVIEW/);
+});
+test('ready formula rejects mixed run IDs, wrong subjects, wrong years and invalid marks', () => {
+  const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
+  for (const [field,bad] of [['RunID','old-run'],['SelectionToken','Biology'],['Subject','Art'],['Year_Group',8]]) {
+    const value = book.output[1][field]; book.output[1][field] = bad;
+    assert.equal(book.ready(),'REFRESH REQUIRED',field); book.output[1][field] = value;
+  }
+  book.output[0].Summer_Invalid = 1; assert.equal(book.ready(),'CHECK INVALID MARKS');
+});
+
+test('Year 7 Science Summer ignores separate exam and both prior/end-of-year quintiles', () => {
+  const grid = fixture('year-7-science'), indices = grid[0].flatMap((h,i) => /End of Year|Prior Attainment/.test(h) ? [i] : []);
+  assert.equal(indices.length,4);
+  const first = expected(grid);
+  for (const row of grid.slice(1)) for (const i of indices) row[i] = '1';
+  assert.deepEqual(expected(grid),first);
+  assert.deepEqual(counts(first[0],'Summer'),[0,0,1,0,1]);
+});
+
+test('reordered headers, NBSP/spacing and the two retained English aliases resolve', () => {
+  const grid = fixture('year-7-english').map(row => [...row].reverse());
+  grid[0] = grid[0].map(h => h.replace(/ /g,' \u00a0 '));
+  for (const [from,to] of [['ENAttainmentY7(%)~2Year7Spring','EN Attainment Y7 (%) Year 7 Spring'],['ENAttainmentY7(%)SuYear7Summer','EN Attainment Y7 (%) Year 7 Summer']]) {
+    const i = grid[0].findIndex(h => key(h) === key(from)); grid[0][i] = to;
+  }
+  const book = installed(); book.paste(grid); process(book);
+  assert.equal(book.cell('KS3_StagedSubject'),'English');
+  assert.deepEqual(counts(expected(book.raw())[0],'Autumn'),[1,2,0,0,1]);
+});
+
+const invalidHeaders = [
+  ['missing Autumn', grid => { const i = grid[0].findIndex(h => /Autumn/.test(h)); return grid.map(row => row.filter((_,j) => j !== i)); }, /Missing Autumn/],
+  ['ambiguous Spring aliases', grid => grid.map((row,i) => [...row,i === 0 ? 'EN Attainment Y7 (%) Year 7 Spring' : '5']), /Multiple columns match Spring/],
+  ['mixed layouts', grid => grid.map((row,i) => [...row,i === 0 ? 'SC Exam Y8 (%)~2 Year 8 Autumn' : '5']), /Ambiguous year\/subject/],
+  ['duplicate heading', grid => grid.map((row,i) => [...row,i === 0 ? ' Class ' : 'wrong']), /repeated column/],
+  ['blank heading', grid => { grid[0][1] = ''; return grid; }, /missing or repeated/],
+  ['no supported term headers', grid => { grid[0] = grid[0].map(h => /Attainment Y7/.test(h) ? 'Unknown '+h : h); return grid; }, /No supported/]
+];
+for (const [name,change,message] of invalidHeaders) test(`${name} clears the old run before failing`, () => {
+  const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
+  clearPaste(book); const grid = change(fixture('year-7-english')); book.paste(grid);
+  assert.throws(() => process(book),message); assert.equal(book.ready(),'NOT READY');
+  assert.equal(book.cell('KS3_CurrentRun'),''); assert.deepEqual(book.getWorksheet('Paste_SIMS').getRangeByIndexes(2,0,grid.length,grid[0].length).getValues(),grid);
+});
+test('Year 9 Science needs an explicit selection and rejects missing/ambiguous selected terms', () => {
+  const book = installed(); book.paste(fixture('year-9-science'));
+  assert.throws(() => process(book),/choose Biology/);
+  select(book,'Physics');
+  const grid = fixture('year-9-science'); grid[0][grid[0].findIndex(h => key(h) === key('PH Attainment Y9 (%)~3 Year 9 Summer'))] = 'unknown Physics Summer';
+  clearPaste(book); book.paste(grid); assert.throws(() => process(book),/Missing Summer/);
+  assert.equal(book.ready(),'NOT READY');
+});
+test('failed staging write preserves paste and invalidates the previous output', () => {
+  const book = installed(), grid = fixture('year-7-english'); book.paste(grid); process(book); refreshModel(book);
+  book.getWorksheet('Data_SIMS').failWrite = true;
+  assert.throws(() => process(book),/Injected write/); assert.equal(book.ready(),'NOT READY');
+  assert.deepEqual(book.getWorksheet('Paste_SIMS').getRangeByIndexes(2,0,grid.length,grid[0].length).getValues(),grid);
+});
+test('larger/wider → smaller/narrower clears raw tails and keeps the same table; Reset clears loaded readiness', () => {
+  const book = installed(), table = book.getTable('SIMS_Raw');
+  book.paste(fixture('year-9-science')); select(book,'Biology'); process(book); refreshModel(book);
+  clearPaste(book); const long = fixture('year-7-english-32-pupils'); book.paste(long); select(book,'Auto'); process(book); refreshModel(book);
+  assert.equal(book.output.length,1); assert.equal(book.output[0].Pupils,32);
+  const small = fixture('year-7-english');
+  clearPaste(book); book.paste(small); process(book); refreshModel(book);
+  assert.equal(book.getTable('SIMS_Raw'),table); assert.deepEqual(book.raw(),small);
+  assert.equal(book.getWorksheet('Data_SIMS').getUsedRange().getRowCount(),small.length);
+  assert.equal(book.getWorksheet('Data_SIMS').getUsedRange().getColumnCount(),small[0].length);
+  assert.deepEqual(book.output.map(row => row.Class),['7SYN/A','7SYN/B']);
+  reset(book); assert.equal(book.ready(),'NOT READY'); assert.deepEqual(book.raw(),[['Surname Forename','Class'],['','']]);
+  assert.equal(book.cell('KS3_SubjectSelection'),'Auto'); assert.equal(book.cell('KS3_StagedSubject'),'');
+  // The real query's RunID="" path publishes an empty table; this mock doesn't execute M.
+  book.output = []; assert.equal(book.ready(),'NOT READY');
+});
+test('formula-looking pupil text is staged literally', () => {
+  const book = installed(), grid = fixture('year-7-english');
+  const names = ['=1+1','+Test','-Test','@Test',"'Test"];
+  names.forEach((name,i) => { grid[i+1][0] = name; });
+  book.paste(grid); process(book); assert.deepEqual(book.raw().slice(1,6).map(r => r[0]),names);
+});
+test('independent oracle: invalid marks, unknown flags, refreshed Art, shared names and full long lists', () => {
+  const grid = fixture('year-7-english'), autumn = grid[0].findIndex(h => /Autumn/.test(h));
+  [' 2 ',6,'2.0','absent',true].forEach((v,i) => { grid[i+1][autumn] = v; });
+  const [a] = expected(grid); assert.equal(a.Autumn_Assessed,1); assert.equal(a.Autumn_Q2,1); assert.equal(a.Autumn_Invalid,4);
+  assert.equal(a.PP_Unknown,3); assert.equal(a.LAC_Unknown,0);
+  const art = fixture('year-7-art').map((row,i) => [...row,i === 0 ? 'Sex' : i % 2 ? 'F' : 'M',i === 0 ? 'Looked After' : i === 2 ? 'Y' : '']);
+  const artA = expected(art)[0]; assert.equal(artA.Sex_Unclassified,0); assert.equal(artA.LAC_List,'Test Pupil 02');
+  const sameNames = fixture('year-7-english'); sameNames[4][0] = sameNames[1][0];
+  assert.equal(expected(sameNames)[0].Boys_List,'Test Pupil 01\nTest Pupil 01');
+  const [long] = expected(fixture('year-7-english-32-pupils'));
+  for (const [field,count] of Object.entries({SEND_K_List:4,EHCP_List:4,Boys_List:16,Girls_List:16,PP_List:8,LAC_List:2})) {
+    assert.equal(long[field].split('\n').length,count); assert.deepEqual(long[field].split('\n'),long[field].split('\n').sort());
+  }
+  assert.equal(long.Boys_List.length,703); assert.equal(long.Girls_List.length,703); assert.equal(long.PP_List.length,351);
+});
+test('in-place upgrade preserves tables, query source and paste; it can be repeated', () => {
+  const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
+  const table = book.getTable('SIMS_Raw'), output = book.output, raw = book.raw();
+  script('upgrade-pilot')(book);
+  assert.equal(book.getTable('SIMS_Raw'),table); assert.equal(book.output,output); assert.deepEqual(book.raw(),raw);
+  assert.equal(book.ready(),'NOT READY'); assert.equal(book.mode,'automatic');
+});
+
+test('Office Script array callbacks use supported arrow syntax', () => {
+  for (const file of fs.readdirSync('office-scripts').filter(f => f.endsWith('.ts'))) {
+    const ast = ts.createSourceFile(file,read('office-scripts/'+file),ts.ScriptTarget.Latest,true);
+    const visit = node => {
+      if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)
+          && ['map','filter','some','every','find','forEach','reduce'].includes(node.expression.name.text)) {
+        assert(ts.isArrowFunction(node.arguments[0]),file+': array callbacks must be arrow functions');
+      }
+      ts.forEachChild(node,visit);
+    };
+    visit(ast);
+  }
+});
+test('old pilot upgrades in two passes without referencing missing output columns', () => {
+  const book = new Workbook(), paste = book.addWorksheet('Paste_SIMS'), raw = book.addWorksheet('Data_SIMS');
+  raw.getRange('A1:B2').setValues([['Surname Forename','Class'],['Test Pupil 01','7SYN/A']]);
+  raw.addTable(raw.getRange('A1:B2')).setName('SIMS_Raw');
+  book.addNamedItem('KS3_CurrentRun',paste.getRange('B2')); book.cell('KS3_CurrentRun','old-run');
+  book.tables.set('KS3_Merge_Final',{getColumnByName: () => undefined});
+  const table = book.getTable('SIMS_Raw');
+  script('upgrade-pilot')(book);
+  assert.equal(book.cell('KS3_CurrentRun'),''); assert.equal(paste.getRange('D2').getValue(),'NOT READY');
+  assert.match(paste.getRange('A2').getValue(),/Replace the query/); assert.equal(book.getTable('SIMS_Raw'),table);
+  // Stand in for the first successful blank-run refresh loading the new schema.
+  book.tables.set('KS3_Merge_Final',{getColumnByName: () => ({})});
+  script('upgrade-pilot')(book);
+  assert.match(paste.getRange('D2').getValue(),/^=IF/); assert.equal(book.ready(),'NOT READY');
+});
+test('unheaded data beyond the input and header-only input both invalidate the run', () => {
+  const book = installed(), grid = fixture('year-7-english');
+  const overflow = grid.map((row,i) => [...row,i === 1 ? 'unexpected' : '']);
+  book.paste(overflow); assert.throws(() => process(book),/beyond the last heading/);
+  assert.equal(book.ready(),'NOT READY'); clearPaste(book);
+  book.paste([grid[0]]); assert.throws(() => process(book),/headers and pupil rows/);
+  assert.equal(book.ready(),'NOT READY');
+});

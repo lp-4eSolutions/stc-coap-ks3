@@ -1,5 +1,7 @@
 # Year 7 English pilot
 
+This is the original pilot record. For the current source, use the [in-place upgrade and operating instructions](REMAINING_LAYOUTS.md), which supersede the original installation and readiness formula below. The fixture expectations and seven Word fields remain unchanged.
+
 ## Install in a blank school workbook
 
 1. In desktop Excel, create and save a blank workbook for the synthetic pilot. In **Automate**, create an Office Script from [Setup Pilot](../office-scripts/setup-pilot.ts) and run it once. It creates the paste sheet, the input table and the run ID cell.
