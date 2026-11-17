@@ -14,8 +14,8 @@
 ## Run the pilot
 
 1. Copy the full grid of the [synthetic export](../tests/year-7-english.tsv), including headings, into `Paste_SIMS!A3`. If the TSV opens as one column, open it in Excel as a tab-delimited file first. Run **Process Pupil Data** and look for **REFRESH REQUIRED**.
-2. In **Queries & Connections**, refresh **KS3_Merge_Final** and wait for successful completion. Use **READY TO REVIEW** and compare the output against the expected results below. `Rows_Without_Class` is a run total repeated on each class row.
-3. Save the workbook. In desktop Word, open a local working copy of the supplied template. Under **Mailings → Select Recipients → Use an Existing List**, select the saved workbook and the `KS3_Merge_Final` worksheet/table. This direct query source remains provisional until the Word data-source diagnosis below is complete. Insert these fields into the corresponding blank cells while keeping the template headings as supplied.
+2. In **Queries & Connections**, refresh **KS3_Merge_Final** and wait for successful completion. Use **READY TO REVIEW** and compare the output against the expected results below. `Rows_Without_Class` is a run total repeated on each class row. Keep the merge worksheet limited to headers and current query records; put `LEN` formulas and other diagnostics on a separate worksheet.
+3. Check that every output row's `RunID` matches `Paste_SIMS!B2`, then save and close the workbook. In desktop Word, open a local working copy of the supplied template. Under **Mailings → Select Recipients → Use an Existing List**, select the correct saved workbook and the `KS3_Merge_Final` worksheet/table. Check the recipient list before merging: it must contain exactly the current class records, with the complete name lists rather than `0`. Insert these fields into the corresponding blank cells while keeping the template headings as supplied.
 
    | Word cell | Field |
    | --- | --- |
@@ -51,22 +51,26 @@ SEND K, EHCP, Boys, Girls, PP and LAC all use the shared `NameList` helper. It s
 
 Expect one row without a class, one unclassified sex and three unknown PP values in class A, and zero unknown LAC values for either class. Test Pupil 08 appears in neither record. The end-of-year exam values do not enter Summer counts.
 
-## Word data-source diagnosis — desktop test pending
+## Word repeat check — run locally in desktop Office
 
-The operator reports that the original `KS3_Merge_Final` source returned `0` for Boys, Girls and PP even in a plain Word merge. The same headers and `7SYN/LONG` values pasted into a new `.xlsx` merged correctly in both a plain document and the KS3 CoaP template. This does not yet establish whether the difference is the query output, the workbook or Word's connection. No merge-source fix has been selected or verified.
+The operator initially saw `0` for Boys, Girls and PP, then reported that all relevant fields merged correctly from the original KS3 workbook after removing the diagnostic row. Inspection of the supplied synthetic workbooks found identical saved name strings, including newlines, and equivalent cell types and wrapping. Both Word connections used ACE OLE DB 12.0 with `HDR=YES;IMEX=1`. The initial failure preceded the diagnostic row, so its original cause is unconfirmed. Retain the direct query output; a separate values-only merge sheet is not currently justified.
 
-1. Work on a local copy of the existing KS3 workbook. From the successful control `.xlsx`, copy the exact headers and complete `7SYN/LONG` row into `A1` on a new worksheet named `KS3_Word_Probe` **inside that KS3 workbook**, using **Paste Special → Values**. Keep column order, field names and embedded line feeds unchanged. Check the copied cell contents against the control, then save and close both workbooks. The probe is a diagnostic snapshot, not an operational merge source.
-2. In desktop Word, explicitly reconnect a working copy of the plain merge document to the KS3 workbook's `KS3_Word_Probe` sheet. Use the same connection method and merge fields as for the successful control. Preview and finish the merge, comparing the complete text of all six name lists with the control. Repeat in a working copy of the CoaP template, preserving its headings. Record the actual source file and selected sheet/range for each test.
-3. If that sheet reads correctly, reconnect to the original query output in the same workbook using the same connection method. Explicitly check the selected sheet/table/range rather than reusing a cached connection. If the query output can pass the fixture checks below directly, retain it. If it still fails while the values-only sheet passes, a dedicated values-only merge sheet is a candidate, subject to implementation and the freshness checks below.
-4. If the probe also fails inside the KS3 workbook, compare Word's connections to the failing KS3 file and the successful control **before proposing a fix**. Record Excel/Word versions and bitness, exact saved file paths and file types, provider/connection method (for example OLE DB, ODBC or DDE), connection string, selected sheet/table/named range, SQL command and recipient filters. Check that both tests read the saved files and intended rows. Change one evidenced difference at a time and repeat the plain-document test before testing the template. Keep operational paths and connection details in the school's test notes.
+Run this sequence on the operator's machine. Code checks and file inspection do not verify desktop Excel refresh or Word's ACE reader.
 
-Whichever source is chosen must pass both the [32-pupil fixture](../tests/year-7-english-32-pupils.tsv) and the [original two-class fixture](../tests/year-7-english.tsv) through Process → refresh → save → desktop Word. Check both preview and finished documents in the plain merge and the CoaP template. Compare every name in all six lists with the source, including the full last name in the longest list; counts alone do not prove that text was not truncated. For the long fixture, Excel `LEN` should report 703 characters for each of `Boys_List` and `Girls_List`, and 351 for `PP_List`, including line feeds. Expect one `7SYN/LONG` record, then two isolated records (`7SYN/A` and `7SYN/B`). Every name must appear in full, sorted, one pupil per line. Multiple pages are acceptable.
+| Stage | Source | Expected Word recipients |
+| --- | --- | --- |
+| 1 | [32-pupil fixture](../tests/year-7-english-32-pupils.tsv) | Exactly one: `7SYN/LONG`, 32 pupils |
+| 2 | [Original two-class fixture](../tests/year-7-english.tsv) | Exactly two: `7SYN/A` (5 pupils), `7SYN/B` (2 pupils); no LONG record |
+| 3 | 32-pupil fixture again | Exactly one: `7SYN/LONG`; no A or B records |
+| 4 | Reset, then successfully refresh and save | No previous class records; a no-recipient message is acceptable |
 
-If a separate values-only merge sheet is needed, acceptance also requires these safeguards:
+For stages 1–3, close Word, run Reset, paste the fixture, Process, and successfully refresh the query. Verify **READY TO REVIEW**, the expected class count and a new `RunID` matching `Paste_SIMS!B2` on every output row. Save and close Excel, then explicitly reconnect Word to that saved workbook and the correct merge worksheet. In **Edit Recipient List**, check the exact recipients and full text of all six name lists before previewing and finishing the merge in the CoaP template. Every name must appear in full, sorted, starting on its own line; long names may wrap and reports may span multiple pages. Blank lists must stay blank. Check the final name in each list, not just the pupil count.
 
-- Publish only after a successful query refresh, with a nonblank `RunID` matching `KS3_CurrentRun` on every source row and the expected current class count. Copy all fields and their full text; preserve the existing merge field names.
-- Process and Reset must invalidate and clear the published rows before changing the source. Failed processing, failed/cancelled refresh, or failed publication must leave no merge-ready snapshot. Rebuilding a smaller run must remove surplus old rows. A readiness banner alone cannot stop Word from reading stale saved values.
-- Save invalidation and successful publication to disk, and close/reconnect Word between runs so it reads the current saved source. Test the sequence LONG → two classes → class B only, plus Reset and each failure path. After invalidation, verify that Word cannot merge the previous run. After successful publication, verify the saved merge rows' run ID and exact current records. Keep this approach pending until those checks pass in desktop Office.
+The long fixture expects 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP and 2 LAC names. Its Boys and Girls strings are 703 characters each and PP is 351, including line feeds. If using Excel `LEN` to check these values, place those formulas on a separate diagnostics worksheet.
+
+Reset clears input and invalidates the run ID; it does not immediately remove previously loaded query rows. Stage 4 therefore requires a successful refresh with the cleared run ID, followed by saving and reconnecting Word. After any failed or cancelled Process/refresh, do not merge the old output. The readiness formula is an operator check, not a restriction enforced by Word.
+
+Record pass/fail for each stage, the run IDs and Excel/Word versions locally. The repeat sequence remains pending until the operator completes it. If `0` or truncated names recur, stop at that stage and retain the synthetic saved workbook and its Word source details for comparison before changing the query or adding another merge source.
 
 ## Follow-up checks
 
