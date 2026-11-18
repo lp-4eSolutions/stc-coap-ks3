@@ -20,10 +20,19 @@ function main(workbook: ExcelScript.Workbook) {
     ranges[i].clear(ExcelScript.ClearApplyTo.contents);
   });
   control.getRange("A1:A3").setValues([["Staged selection"], ["Staged subject"], ["Staged year"]]);
-  paste.getRange("C1").setValue("Select Subject (Automate)");
+  paste.getRange("C1").setValue("Subject (choose in C2)");
   paste.getRange("C2").setValue("Auto");
+  const validation = paste.getRange("C2").getDataValidation();
+  validation.clear();
+  validation.setRule({ list: { inCellDropDown: true, source: "Auto,Biology,Physics,Chemistry" } });
+  validation.setIgnoreBlanks(false);
+  validation.setErrorAlert({
+    showAlert: true, style: ExcelScript.DataValidationAlertStyle.stop,
+    title: "Choose a subject", message: "Choose Auto, Biology, Physics or Chemistry from C2."
+  });
   paste.getRange("D1").setValue("Current output check");
   // Compare every loaded record, including subject/selection. Invalid marks block readiness.
+  // Dropdown edits leave the staged run intact: returning to its choice can recognise its output.
   const output = workbook.getTable("KS3_Merge_Final");
   const hasCurrentSchema = output && output.getColumnByName("SelectionToken");
   if (hasCurrentSchema) {
@@ -32,7 +41,7 @@ function main(workbook: ExcelScript.Workbook) {
     // END READINESS FORMULA
   }
   paste.getRange("A2").setValue(hasCurrentSchema
-    ? "Upgraded. Paste at A3. Select Subject for Year 9 Science, then Process and refresh."
+    ? "Upgraded. Paste at A3. Choose the subject in C2, then Process and refresh."
     : "Controls installed. Replace the query, refresh it to empty, then run Upgrade Pilot again to enable readiness.");
   workbook.getApplication().setCalculationMode(ExcelScript.CalculationMode.automatic);
   workbook.getApplication().calculate(ExcelScript.CalculationType.full);

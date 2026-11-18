@@ -16,7 +16,8 @@ export function script(name) {
   }));
   const context = vm.createContext({ ExcelScript: {
     ClearApplyTo: { contents: 'contents' }, SheetVisibility: { hidden: 'hidden' },
-    CalculationType: { full: 'full' }, CalculationMode: { automatic: 'automatic' }
+    CalculationType: { full: 'full' }, CalculationMode: { automatic: 'automatic' },
+    DataValidationAlertStyle: { stop: 'stop' }
   }});
   vm.runInContext(result.outputText, context);
   return (workbook, ...args) => context.main(workbook, ...args);
@@ -47,9 +48,19 @@ class Range {
     }
   }
   getFormat() { return { getFill: () => ({ setColor() {} }), getFont: () => ({ setColor() {}, setBold() {} }), setColumnWidth() {} }; }
+  getDataValidation() {
+    const address = `${this.row},${this.col}`;
+    return {
+      clear: () => this.sheet.validation.set(address,{}),
+      setRule: rule => { this.sheet.validation.get(address).rule = rule; },
+      setIgnoreBlanks: value => { this.sheet.validation.get(address).ignoreBlanks = value; },
+      setErrorAlert: alert => { this.sheet.validation.get(address).errorAlert = alert; }
+    };
+  }
 }
 class Worksheet {
   cells = new Map();
+  validation = new Map();
   constructor(workbook, name) { Object.assign(this, { workbook, name }); }
   getRangeByIndexes(...args) { return new Range(this, ...args); }
   getRange(address) {

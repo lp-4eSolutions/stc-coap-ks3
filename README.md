@@ -10,6 +10,6 @@ A SIMS-to-Word reporting tool for Years 7–9. The operator pastes a SIMS marksh
 
 This public repository holds portable source and fully synthetic fixtures. Keep operational workbooks, school templates, SIMS exports, pupil data, generated reports and tenant-specific links or script associations in the school's Microsoft 365 environment.
 
-Supported exports: Year 7 English, Art and Science; Year 8 French, Maths and Science; Year 9 DT and a combined Science export processed separately for Biology, Physics and Chemistry. Keep one processor workbook and the existing `KS3_Merge_Final` Word source.
+Supported exports: Year 7 English, Art and Science; Year 8 French, Maths and Science; Year 9 DT and a combined Science export processed separately for Biology, Physics and Chemistry. Choose the subject from the `Paste_SIMS!C2` dropdown. Keep one processor workbook and the existing `KS3_Merge_Final` Word source.
 
 For source checks, run `npm ci --ignore-scripts` and `npm test`. Edit header aliases in `config/layouts.json`, then run `npm run generate` to update both standalone runtime sources.

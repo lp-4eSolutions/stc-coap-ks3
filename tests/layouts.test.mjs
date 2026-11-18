@@ -6,7 +6,7 @@ import { TaskUtils, DefaultSettings } from '@microsoft/powerquery-parser';
 import { Workbook, fixture, installed, read, script } from './support/workbook.mjs';
 import { config, expected, key, terms } from './support/reference.mjs';
 
-const process = script('process-pupil-data'), reset = script('reset'), select = script('select-subject');
+const process = script('process-pupil-data'), reset = script('reset');
 const counts = (row,term) => [1,2,3,4,5].map(q => row[`${term}_Q${q}`]);
 function refreshModel(book) { book.output = expected(book.raw(), book.cell('KS3_SubjectSelection'), book.cell('KS3_CurrentRun')); }
 function clearPaste(book) {
@@ -14,9 +14,9 @@ function clearPaste(book) {
   if (used && used.getRowCount() > 2) sheet.getRangeByIndexes(2,0,used.getRowCount()-2,used.getColumnCount()).clear();
 }
 
-test('all six standalone Office Scripts parse as TypeScript', () => {
+test('all five standalone Office Scripts parse as TypeScript', () => {
   const files = fs.readdirSync('office-scripts').filter(n => n.endsWith('.ts'));
-  assert.equal(files.length,6);
+  assert.equal(files.length,5);
   for (const name of files) script(name.slice(0,-3));
 });
 test('production Power Query parses with the Microsoft M parser', async () => {
@@ -32,7 +32,7 @@ for (const layout of config.layouts) {
     test(`${layout.id} / ${subject.subject}: actual Process resolves and stages; reference counts and readiness`, () => {
       const book = installed(), grid = fixture(layout.id);
       const choice = layout.subjects.length > 1 ? subject.subject : 'Auto';
-      select(book,choice); book.paste(grid); process(book);
+      book.cell('KS3_SubjectSelection',choice); book.paste(grid); process(book);
       assert.equal(book.cell('KS3_StagedYear'),layout.year);
       assert.equal(book.cell('KS3_StagedSubject'),subject.subject);
       assert.deepEqual(book.raw(),grid.map(row => row.map((value,i) => i < grid[0].length ? value.replace(/\u00a0/g,' ').trim() : value)));
@@ -71,22 +71,54 @@ for (const layout of config.layouts) {
   }
 }
 
-test('same Year 9 paste, three selections, changing away and back never revives a run', () => {
+test('same Year 9 paste processes Biology, Physics and Chemistry from C2', () => {
   const book = installed(); book.paste(fixture('year-9-science'));
-  let lastRun;
+  let lastRun = '';
   for (const subject of ['Biology','Physics','Chemistry','Biology']) {
-    select(book,subject);
-    assert.equal(book.cell('KS3_CurrentRun'),''); assert.equal(book.ready(),'NOT READY');
+    book.cell('KS3_SubjectSelection',subject);
+    assert.equal(book.cell('KS3_CurrentRun'),lastRun);
+    assert.equal(book.ready(),lastRun ? 'PROCESS REQUIRED' : 'NOT READY');
     process(book); assert.notEqual(book.cell('KS3_CurrentRun'),lastRun);
     assert.equal(book.ready(),'REFRESH REQUIRED');
     refreshModel(book); assert.match(book.ready(),new RegExp(subject));
     assert.equal(book.output[0].Subject,subject); lastRun = book.cell('KS3_CurrentRun');
   }
-  select(book,'Biology'); assert.equal(book.ready(),'NOT READY');
+  book.cell('KS3_SubjectSelection','Biology'); assert.match(book.ready(),/^READY TO REVIEW/);
 });
-test('direct selection change immediately fails the installed readiness formula', () => {
-  const book = installed(); select(book,'Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
-  book.cell('KS3_SubjectSelection','Physics'); assert.equal(book.ready(),'PROCESS REQUIRED');
+test('dropdown away/back recognises the existing output when the staged run is unchanged', () => {
+  const book = installed(); book.cell('KS3_SubjectSelection','Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
+  const run = book.cell('KS3_CurrentRun'), output = book.output, staged = book.raw(), ready = book.ready();
+  for (const choice of ['Physics','Chemistry','Auto']) {
+    book.cell('KS3_SubjectSelection',choice); assert.equal(book.ready(),'PROCESS REQUIRED');
+    assert.equal(book.cell('KS3_CurrentRun'),run); assert.equal(book.cell('KS3_StagedSelection'),'Biology');
+    assert.equal(book.output,output); assert.deepEqual(book.raw(),staged);
+    book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),ready);
+  }
+  book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),ready);
+});
+test('Process reads C2 and invalidates before staging; switching back cannot revive an older run', () => {
+  const book = installed(); book.cell('KS3_SubjectSelection','Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
+  const previousRun = book.cell('KS3_CurrentRun'), oldOutput = book.output, table = book.getTable('SIMS_Raw');
+  book.cell('KS3_SubjectSelection','Physics');
+  const resize = table.resize;
+  let staged = false;
+  table.resize = range => {
+    staged = true; assert.equal(book.cell('KS3_CurrentRun'),''); assert.equal(book.ready(),'NOT READY');
+    resize(range);
+  };
+  process(book);
+  assert(staged); assert.notEqual(book.cell('KS3_CurrentRun'),previousRun);
+  assert.equal(book.cell('KS3_StagedSelection'),'Physics'); assert.equal(book.cell('KS3_StagedSubject'),'Physics');
+  assert.equal(book.output,oldOutput); assert.equal(book.ready(),'REFRESH REQUIRED');
+  book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),'PROCESS REQUIRED');
+  book.cell('KS3_SubjectSelection','Physics'); assert.equal(book.ready(),'REFRESH REQUIRED');
+  refreshModel(book); assert.match(book.ready(),/Year 9 Physics/);
+});
+test('a failed Process after a dropdown change stays invalid when returning to the old choice', () => {
+  const book = installed(); book.cell('KS3_SubjectSelection','Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
+  book.cell('KS3_SubjectSelection','Physics'); book.getWorksheet('Data_SIMS').failWrite = true;
+  assert.throws(() => process(book),/Injected write/); assert.equal(book.ready(),'NOT READY');
+  book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),'NOT READY');
 });
 test('a failed or cancelled refresh retains old rows but cannot mark the new run ready', () => {
   const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
@@ -142,7 +174,7 @@ for (const [name,change,message] of invalidHeaders) test(`${name} clears the old
 test('Year 9 Science needs an explicit selection and rejects missing/ambiguous selected terms', () => {
   const book = installed(); book.paste(fixture('year-9-science'));
   assert.throws(() => process(book),/choose Biology/);
-  select(book,'Physics');
+  book.cell('KS3_SubjectSelection','Physics');
   const grid = fixture('year-9-science'); grid[0][grid[0].findIndex(h => key(h) === key('PH Attainment Y9 (%)~3 Year 9 Summer'))] = 'unknown Physics Summer';
   clearPaste(book); book.paste(grid); assert.throws(() => process(book),/Missing Summer/);
   assert.equal(book.ready(),'NOT READY');
@@ -155,8 +187,8 @@ test('failed staging write preserves paste and invalidates the previous output',
 });
 test('larger/wider → smaller/narrower clears raw tails and keeps the same table; Reset clears loaded readiness', () => {
   const book = installed(), table = book.getTable('SIMS_Raw');
-  book.paste(fixture('year-9-science')); select(book,'Biology'); process(book); refreshModel(book);
-  clearPaste(book); const long = fixture('year-7-english-32-pupils'); book.paste(long); select(book,'Auto'); process(book); refreshModel(book);
+  book.paste(fixture('year-9-science')); book.cell('KS3_SubjectSelection','Biology'); process(book); refreshModel(book);
+  clearPaste(book); const long = fixture('year-7-english-32-pupils'); book.paste(long); book.cell('KS3_SubjectSelection','Auto'); process(book); refreshModel(book);
   assert.equal(book.output.length,1); assert.equal(book.output[0].Pupils,32);
   const small = fixture('year-7-english');
   clearPaste(book); book.paste(small); process(book); refreshModel(book);
@@ -166,6 +198,7 @@ test('larger/wider → smaller/narrower clears raw tails and keeps the same tabl
   assert.deepEqual(book.output.map(row => row.Class),['7SYN/A','7SYN/B']);
   reset(book); assert.equal(book.ready(),'NOT READY'); assert.deepEqual(book.raw(),[['Surname Forename','Class'],['','']]);
   assert.equal(book.cell('KS3_SubjectSelection'),'Auto'); assert.equal(book.cell('KS3_StagedSubject'),'');
+  assert.equal(book.getWorksheet('Paste_SIMS').validation.get('1,2').rule.list.source,'Auto,Biology,Physics,Chemistry');
   // The real query's RunID="" path publishes an empty table; this mock doesn't execute M.
   book.output = []; assert.equal(book.ready(),'NOT READY');
 });
@@ -233,4 +266,46 @@ test('unheaded data beyond the input and header-only input both invalidate the r
   assert.equal(book.ready(),'NOT READY'); clearPaste(book);
   book.paste([grid[0]]); assert.throws(() => process(book),/headers and pupil rows/);
   assert.equal(book.ready(),'NOT READY');
+});
+
+for (const name of ['setup-pilot','upgrade-pilot']) test(`${name} installs the C2 validation dropdown with exactly four choices`, () => {
+  const book = name === 'setup-pilot' ? new Workbook() : installed();
+  script(name)(book);
+  const sheet = book.getWorksheet('Paste_SIMS'), validation = sheet.validation.get('1,2');
+  assert.equal(sheet.getRange('C2').getValue(),'Auto');
+  assert.equal(validation.rule.list.source,'Auto,Biology,Physics,Chemistry');
+  assert.equal(validation.rule.list.inCellDropDown,true);
+  assert.equal(validation.ignoreBlanks,false);
+  assert.equal(validation.errorAlert.showAlert,true); assert.equal(validation.errorAlert.style,'stop');
+  assert.equal(sheet.getRange('C1').getValue(),'Subject (choose in C2)');
+});
+test('Process rejects blank or unsupported choices even if pasted over data validation', () => {
+  for (const choice of ['', 'Geography', 'English']) {
+    const book = installed(); book.cell('KS3_SubjectSelection','Biology'); book.paste(fixture('year-9-science')); process(book); refreshModel(book);
+    const raw = book.raw(); book.cell('KS3_SubjectSelection',choice);
+    assert.equal(book.ready(),'PROCESS REQUIRED');
+    assert.throws(() => process(book),/C2 dropdown/); assert.equal(book.ready(),'NOT READY');
+    assert.deepEqual(book.raw(),raw);
+    book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),'NOT READY');
+  }
+});
+test('Help describes the C2 dropdown and preserves the current valid run', () => {
+  const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
+  const run = book.cell('KS3_CurrentRun'), ready = book.ready(); script('help')(book);
+  assert.match(book.getWorksheet('Paste_SIMS').getRange('A2').getValue(),/choose C2/);
+  assert.equal(book.cell('KS3_CurrentRun'),run); assert.equal(book.ready(),ready);
+});
+
+test('restaging changed Biology marks prevents away/back from recognising the old output', () => {
+  const book = installed(), grid = fixture('year-9-science');
+  book.cell('KS3_SubjectSelection','Biology'); book.paste(grid); process(book); refreshModel(book);
+  const oldOutput = book.output, oldRun = book.cell('KS3_CurrentRun');
+  const summer = grid[0].findIndex(h => key(h) === key('BI Attainment Y9 (%)~3 Year 9 Summer'));
+  grid[1][summer] = '5'; clearPaste(book); book.paste(grid); process(book);
+  assert.notEqual(book.cell('KS3_CurrentRun'),oldRun); assert.equal(book.output,oldOutput);
+  assert.equal(book.ready(),'REFRESH REQUIRED');
+  book.cell('KS3_SubjectSelection','Physics'); assert.equal(book.ready(),'PROCESS REQUIRED');
+  book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),'REFRESH REQUIRED');
+  refreshModel(book); assert.match(book.ready(),/Year 9 Biology/);
+  assert.deepEqual(counts(book.output[0],'Summer'),[0,0,3,0,1]);
 });

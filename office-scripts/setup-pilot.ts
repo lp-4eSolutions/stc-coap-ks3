@@ -19,9 +19,17 @@ function main(workbook: ExcelScript.Workbook) {
   workbook.addNamedItem("KS3_StagedSubject", control.getRange("B2"));
   workbook.addNamedItem("KS3_StagedYear", control.getRange("B3"));
   paste.getRange("C2").setValue("Auto");
+  const validation = paste.getRange("C2").getDataValidation();
+  validation.clear();
+  validation.setRule({ list: { inCellDropDown: true, source: "Auto,Biology,Physics,Chemistry" } });
+  validation.setIgnoreBlanks(false);
+  validation.setErrorAlert({
+    showAlert: true, style: ExcelScript.DataValidationAlertStyle.stop,
+    title: "Choose a subject", message: "Choose Auto, Biology, Physics or Chemistry from C2."
+  });
 
   paste.getRange("A1").setValue("KS3 Class on a Page");
-  paste.getRange("C1").setValue("Select Subject (Automate)");
+  paste.getRange("C1").setValue("Subject (choose in C2)");
   paste.getRange("A2").setValue("Paste the SIMS export into A3, then run Process Pupil Data.");
   paste.getRange("A3").setValue("Paste SIMS export here");
   paste.getRange("A1:D1").getFormat().getFill().setColor("#17365D");

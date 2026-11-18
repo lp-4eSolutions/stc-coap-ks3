@@ -261,7 +261,7 @@ function resolveRun(headers: string[], selection: string): { year: number; subje
   const layout = candidates[0];
   const subject = layout.subjects.length === 1 ? layout.subjects[0]
     : layout.subjects.find(s => s.subject === selection);
-  if (!subject) throw new Error("Year 9 Science: run Select Subject and choose Biology, Physics or Chemistry.");
+  if (!subject) throw new Error("Year 9 Science: choose Biology, Physics or Chemistry in C2.");
   const bindings: Binding[] = profile.concat(subject.terms.map((aliases, i): Binding =>
     [["Autumn", "Spring", "Summer"][i], true, aliases]));
   for (const [name, required, aliases] of bindings) {
@@ -285,7 +285,7 @@ function main(workbook: ExcelScript.Workbook) {
   try {
     const selection = String(workbook.getNamedItem("KS3_SubjectSelection").getRange().getValue());
     if (!["Auto", "Biology", "Physics", "Chemistry"].includes(selection)) {
-      throw new Error("Run Select Subject: choose Auto, Biology, Physics or Chemistry.");
+      throw new Error("Choose Auto, Biology, Physics or Chemistry from the C2 dropdown.");
     }
     const used = paste.getUsedRange(true);
     const rowCount = used ? used.getRowIndex() + used.getRowCount() - 2 : 0;
