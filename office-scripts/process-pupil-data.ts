@@ -44,6 +44,14 @@ const profile: Binding[] = [
     [
       "Looked After"
     ]
+  ],
+  [
+    "PriorAttainment",
+    true,
+    [
+      "Prior Attainment Quintile",
+      "Prior Attainment Qiuntine"
+    ]
   ]
 ];
 const layouts: Layout[] = [

@@ -1,44 +1,64 @@
-# Regression evidence
+# Regression evidence — confirmed reporting fields
 
-These are portable-source checks for the remaining-layout upgrade, based on main `988e770`. Reproduce with Node.js 24: `npm ci --ignore-scripts` then `npm test`. No operational workbook, pupil data, Word template or tenant association is committed.
+The implementation starts from the latest PR branch `0929eb3`, including the confirmed 19 November definitions and revised roadmap. Reproduce with Node.js 24: `npm ci --ignore-scripts` then `npm test`. Public inputs and outputs here are fully synthetic. Keep the school workbook and 19 November Word template outside the repository.
 
-## Automated
+## Automated checks
 
-On 18 November 2026, `npm test` passed all **41 checks** on Node.js 24.22.1, including the C2 dropdown update. The results below distinguish automated checks from native Office acceptance.
+On 19 November 2026, `npm test` passed all **81 checks** on Node.js 24.22.1.
 
-- The generated standalone Process and M binding blocks match the one observed-header map, which covers all eight layouts (ten subject runs).
-- All five Office Script files parse as TypeScript. The production M source parses with Microsoft's Power Query parser.
-- The **actual** Process, Reset, Setup, Upgrade and Help entrypoints run against an in-memory workbook mock. Checks include all eight synthetic exports; correct resolved year/subject; repeated Biology → Physics → Chemistry on the same paste; C2 changes including away/back and reselecting; invalidation before staging and rejection of old output after a new/failed Process; missing, ambiguous, duplicate and mixed-layout headers; failed staging writes; literal source text; and clearing both dimensions of the existing staging table after wider/larger input.
-- The **actual installed readiness formula** is evaluated with HyperFormula after translating structured references to ranges. Checks cover old/mixed run IDs, wrong year/subject/selection, changed selections and recognition after returning to the unchanged staged choice, empty output, invalid marks, and a simulated failed/cancelled refresh that leaves old loaded rows. This is formula-engine verification, not Excel-client acceptance.
-- Setup and Upgrade install the exact four-option C2 data-validation list with an in-cell dropdown and Stop alert. Reset keeps the dropdown, and Process rejects blank/unsupported choices even if pasted over validation. These mock checks inspect API calls; the actual dropdown and alert still need checking in desktop Excel.
-- An independent JavaScript expected-results model checks fixture counts, class isolation, all six profile lists, blank/unknown flags, invalid/text marks, preserved duplicate names and complete 32-pupil lists. Year 9 subject marks differ in every term; changing the Year 7 Science exam/prior-attainment columns leaves expected Summer counts unchanged. This model is **not an M evaluator**; these expected results must still be compared with native Power Query.
+The suite checks generated binding consistency, production M syntax with Microsoft's parser, all five Office Script sources and actual script entrypoints against a workbook mock. HyperFormula evaluates the installed readiness formula, including reporting-version rejection, C2 changes/return to the unchanged staged selection, early invalidation by Process, failed writes/refresh, smaller-after-larger staging and Reset. Setup/Upgrade retain the four-option data-validation dropdown.
 
-## Synthetic expected results
+An independent JavaScript reference model verifies fixture name lists, band boundaries, prior/percentage independence, invalid inputs, numeric text, genuine zeroes, null means and unequal-class pupil weighting. Tests cover all eight layouts/ten subject runs and repeat all boundaries/invalid checks for every subject/term binding. The manifest is checked for all 33 fields and the supplied descending band order. The [saved full reference results](../tests/expected-results.json) cover all ten runs plus validation and long-name fixtures; `npm run expected` regenerates them after deliberate fixture/model changes and `npm test` detects stale results.
 
-Each eight-pupil fixture has class A (pupils 01–05), class B (06–07), and pupil 08 without a class. Expect two output rows; `Rows_Without_Class=1` is repeated on each row. All pupil values are synthetic. Art/French/Maths/DT/Year 9 Science retain the operator's supplied header row; Science 7–8 use documented projected headers. All table names and merge-field names remain unchanged.
+**These checks do not execute M.** The reference model is an oracle for native comparison, not proof of Power Query runtime or Word behaviour. Native checks are listed separately below.
 
-For English, Art, French, Maths, DT and Years 7–8 Science, class A has:
+## Revised eight-layout fixtures
 
-| Term | Assessed | Q1, Q2, Q3, Q4, Q5 | Invalid |
+Every normal fixture has 15 named synthetic pupils: class A is 01–11, class B is 12–14, and pupil 15 has no class and blank term marks. Expect **two** output rows, pupil counts 11 and 3, and `Rows_Without_Class=1` on both. Fixture headers retain the observed layouts and aliases. English now includes the required baseline header. Art's supplied header omits LAC; the five newly supplied layouts omit Sex, so those diagnostics remain unavailable/unclassified. Tests also append Sex/LAC to Art to verify the refreshed shape.
+
+For every single-subject fixture and **Year 9 Biology**, class A Autumn is:
+
+| Pupil numbers | Marks | Field / inclusive band |
+| --- | --- | --- |
+| 09, 10 | 81, 100 | `Autumn_Band_81_100_List` |
+| 07, 08 | 61, 80 | `Autumn_Band_61_80_List` |
+| 05, 06 | 41, 60 | `Autumn_Band_41_60_List` |
+| 03, 04 | 21, 40 | `Autumn_Band_21_40_List` |
+| 01, 02 | 0, 20 | `Autumn_Band_0_20_List` |
+| 11 | blank | no term list / unassessed |
+
+Each listed name is `Test Pupil NN`. Expect **10 assessed, 0 invalid, two names per band, mean 50.4%**. Prior lists are independent: Q1=01/06, Q2=02/07, Q3=03/08, Q4=04/09, Q5=05/10; pupil 11 has blank baseline. Thus Q1 pupil 01 has a low term mark and Q5 pupil 10 a high mark.
+
+| Run scope | Autumn assessed / mean | Spring assessed / mean | Summer assessed / mean |
 | --- | --- | --- | --- |
-| Autumn | 4 | 1, 2, 0, 0, 1 | 0 |
-| Spring | 0 | 0, 0, 0, 0, 0 | 0 |
-| Summer | 2 | 0, 0, 1, 0, 1 | 0 |
+| Class A | 10 / 50.4 | 0 / blank | 10 / 50.4 |
+| Class B | 3 / 4 | 2 / 50 | 2 / 30.5 |
+| Supplied cohort | 13 / 516÷13 = 39.692307… | 2 / 50 | 12 / 565÷12 = 47.083333… |
 
-Class B has two Autumn Q4 results and two Summer Q2 results. Its Spring marks are 1 and 3 for the original English fixture, and 3 and 3 for the new fixtures. Pupil 08 must not enter any class count or list. In Year 7 Science, the separate exam and both other Summer quintile columns are 5; Summer must still be Q3=1, Q5=1 for class A, and Q2=2 for class B.
+Class B Autumn marks are **1, ` 5 `, 6**, demonstrating that low values are valid percentages. Spring marks are **0, `100.0`, blank**, demonstrating zero and numeric text. Summer marks are **21, 40, blank**. A's Summer marks reverse its ten Autumn marks. The year mean is repeated on each class row and is not the unweighted mean of class averages. Pupil 15's blank marks do not enter these figures; a targeted test gives that pupil 100 and verifies that the year mean includes it while class means stay unchanged.
 
-For the **same Year 9 Science paste**, each class-A term has four assessed pupils and class B has two. Each term's marks all lie in the following single quintile, with zero counts in the other four quintiles and zero invalid marks:
+All ordinary A profiles have SEND K=01, EHCP=02, PP=01. B has SEND K/PP=12 and no EHCP. Present LAC has pupil 02 only, with blank cells meaning No. Art reports LAC Unavailable. In fixtures containing Sex, A Boys=01/03/05/07/09, Girls=02/04/06/08/10 and one unclassified; B Boy=13, Girl=12 and one unclassified. The other layouts' Sex counts are fully unclassified. Unknown PP counts are 9 in A and 1 in B.
 
-| Selected subject | Autumn quintile | Spring quintile | Summer quintile |
-| --- | --- | --- | --- |
-| Biology | 1 | 2 | 3 |
-| Physics | 2 | 3 | 4 |
-| Chemistry | 5 | 4 | 1 |
+## Same Year 9 paste, three different subjects
 
-Every fixture has SEND K pupil 01 and EHCP pupil 02 in class A, SEND K pupil 06 in B. Art's original row lacks LAC; report `Unavailable`, with five/two unknowns. Other fixtures have LAC pupil 02 in A and blank LAC in B (blank in a present column means No). The five supplied new rows lack Sex, so every pupil is unclassified and the Boys/Girls lists are blank. Science 7–8 and English have Boys 01/04 and Girls 02/03 in A, with one unclassified pupil; B has Boy 07 and Girl 06. Tests append Sex and LAC to Art to verify the refreshed shape.
+Physics uses `100 − Biology mark`; Chemistry uses `floor(Biology mark ÷ 2)` for valid marks. Blank marks stay blank. This deliberately changes bands as well as means, catching cross-subject binding.
 
-The existing [English pilot guide](YEAR_7_ENGLISH_PILOT.md) gives exact PP lists and the original long-fixture acceptance. The long fixture still has 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP and 2 LAC names; Boys and Girls are each 703 characters including line feeds, PP is 351.
+| Selected subject | A Autumn mean | A Autumn band counts, high → low | B Autumn mean | Year Autumn mean |
+| --- | --- | --- | --- | --- |
+| Biology | 50.4 | 2, 2, 2, 2, 2 | 4 | 516÷13 = 39.692307… |
+| Physics | 49.6 | 1, 2, 2, 2, 3 | 96 | 784÷13 = 60.307692… |
+| Chemistry | 25 | 0, 0, 1, 4, 5 | 5÷3 | 255÷13 = 19.615384… |
 
-## Pending native checks
+Spring A is blank for all three; Spring cohort means are Biology=50, Physics=50, Chemistry=25. Summer cohort means are Biology=565÷12, Physics=635÷12, Chemistry=280÷12. Prior lists are unchanged between selections. Check exact names and all means in the saved JSON. Year 7 Science keeps the separate Summer exam at **99**, both other Summer quintile columns at **5**, and actual term marks at the boundary values; only the actual term column feeds its bands/mean.
 
-This environment has not executed Excel Power Query, the Office Scripts service/compiler, workbook refresh, native data-validation dropdown/alerts and recalculation, shared buttons, saved workbook caching or desktop Word/ACE mail merge for this upgrade. The mock does not execute M or prove native table resize/refresh behaviour. Run the [short desktop checklist](REMAINING_LAYOUTS.md#short-desktop-acceptance-checklist--still-to-run-for-this-upgrade) on the operator's actual Excel and Word clients. The school workbook upgrade and native acceptance remain pending; the draft PR supplies installable source, synthetic fixtures and this evidence.
+## Invalid and long-list cases
+
+[percentage-validation.tsv](../tests/percentage-validation.tsv) puts -1, 101, 20.5 and `absent` in class A Autumn. Valid values there are 0, ` 20 `, 21, `0.0`, `100.0`, 6; pupil 11 is blank. Expect **6 assessed, 4 invalid, class mean 24.5**, B mean 4 and cohort mean **159÷9 = 17.666666…**. Invalid values enter no name list or mean and readiness shows CHECK INVALID MARKS. Separate tests cover invalid/ambiguous/missing baseline columns, boolean/unexpected input, wholly invalid terms, wholly blank terms and all-zero terms. Whole numeric-text `5.0` is valid, fractional `20.5` is invalid.
+
+The revised [32-pupil English fixture](../tests/year-7-english-32-pupils.tsv) retains its original long names and six profile-list counts: 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP, 2 LAC. Now all 32 have prior Q1, Autumn=100, Spring=`0.0`, Summer blank. `Prior_Q1_List`, `Autumn_Band_81_100_List` and `Spring_Band_0_20_List` each contain **32 sorted full names and 1,407 characters** including line feeds. Boys/Girls remain 703 characters each, PP 351. Other prior/term cells and Summer means are blank; Autumn means are 100 and Spring means are 0.
+
+## Native evidence and pending checks
+
+The operator's earlier evidence is retained: on 18 November the C2 dropdown/selection cycle and native Year 9 subject outputs passed; on 19 November the previous revision's long/two-class profile merges and Reset-to-empty passed. Those checks used the previous term-quintile revision. They establish prior import/profile/Word transport behaviour and **do not certify these new percentage/prior-attainment fields or revised fixtures**.
+
+This environment has not executed the new M query in Excel, Office Scripts compilation/service, real query-table schema refresh, saved workbook/ACE field discovery, or the updated 19 November Word template. Run the [focused desktop acceptance checklist](REMAINING_LAYOUTS.md#focused-desktop-word-acceptance--new-reporting-fields-pending). Verify blank means, zero means, numeric formatting, all long new lists, heading/order fidelity and full field binding on the actual clients. Record run IDs, Excel/Word versions and results locally. PR #3 remains open/draft for review and desktop acceptance. Automated checks do not replace the native checklist.

@@ -1,33 +1,33 @@
-Surname Forename	Class	Sex	SEN Status	Pupil Premium Indicator	Looked After	EN  Attainment Y7 (%) Year 7 Autumn	EN  Attainment Y7 (%)~2 Year 7 Spring	EN Attainment Y7 (%)Su Year 7 Summer	EN End of Year Exam% Year 7 Summer
-Test Pupil 32 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		2	3	4	5
-Test Pupil 31 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		1	2	3	4
-Test Pupil 30 Isabella Hamilton-Worthington	7SYN/LONG	F		N		5	1	2	3
-Test Pupil 29 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		4	5	1	2
-Test Pupil 28 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		3	4	5	1
-Test Pupil 27 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		2	3	4	5
-Test Pupil 26 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		1	2	3	4
-Test Pupil 25 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		5	1	2	3
-Test Pupil 24 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		4	5	1	2
-Test Pupil 23 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		3	4	5	1
-Test Pupil 22 Isabella Hamilton-Worthington	7SYN/LONG	F		N		2	3	4	5
-Test Pupil 21 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		1	2	3	4
-Test Pupil 20 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		5	1	2	3
-Test Pupil 19 Alexander Montgomery-Sinclair	7SYN/LONG	M		N	Y	4	5	1	2
-Test Pupil 18 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		3	4	5	1
-Test Pupil 17 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		2	3	4	5
-Test Pupil 16 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		1	2	3	4
-Test Pupil 15 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		5	1	2	3
-Test Pupil 14 Isabella Hamilton-Worthington	7SYN/LONG	F		N		4	5	1	2
-Test Pupil 13 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		3	4	5	1
-Test Pupil 12 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		2	3	4	5
-Test Pupil 11 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		1	2	3	4
-Test Pupil 10 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		5	1	2	3
-Test Pupil 09 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		4	5	1	2
-Test Pupil 08 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		3	4	5	1
-Test Pupil 07 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		2	3	4	5
-Test Pupil 06 Isabella Hamilton-Worthington	7SYN/LONG	F		N		1	2	3	4
-Test Pupil 05 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		5	1	2	3
-Test Pupil 04 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		4	5	1	2
-Test Pupil 03 Alexander Montgomery-Sinclair	7SYN/LONG	M		N	Y	3	4	5	1
-Test Pupil 02 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		2	3	4	5
-Test Pupil 01 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		1	2	3	4
+Surname Forename	Class	Sex	SEN Status	Pupil Premium Indicator	Looked After	EN  Attainment Y7 (%) Year 7 Autumn	EN  Attainment Y7 (%)~2 Year 7 Spring	EN Attainment Y7 (%)Su Year 7 Summer	EN End of Year Exam% Year 7 Summer	Prior Attainment Quintile
+Test Pupil 32 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		5	1
+Test Pupil 31 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		4	1
+Test Pupil 30 Isabella Hamilton-Worthington	7SYN/LONG	F		N		100	0.0		3	1
+Test Pupil 29 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		2	1
+Test Pupil 28 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		1	1
+Test Pupil 27 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		5	1
+Test Pupil 26 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		100	0.0		4	1
+Test Pupil 25 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		100	0.0		3	1
+Test Pupil 24 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		2	1
+Test Pupil 23 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		1	1
+Test Pupil 22 Isabella Hamilton-Worthington	7SYN/LONG	F		N		100	0.0		5	1
+Test Pupil 21 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		4	1
+Test Pupil 20 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		3	1
+Test Pupil 19 Alexander Montgomery-Sinclair	7SYN/LONG	M		N	Y	100	0.0		2	1
+Test Pupil 18 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		100	0.0		1	1
+Test Pupil 17 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		100	0.0		5	1
+Test Pupil 16 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		4	1
+Test Pupil 15 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		3	1
+Test Pupil 14 Isabella Hamilton-Worthington	7SYN/LONG	F		N		100	0.0		2	1
+Test Pupil 13 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		1	1
+Test Pupil 12 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		5	1
+Test Pupil 11 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		4	1
+Test Pupil 10 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		100	0.0		3	1
+Test Pupil 09 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		100	0.0		2	1
+Test Pupil 08 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		1	1
+Test Pupil 07 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		5	1
+Test Pupil 06 Isabella Hamilton-Worthington	7SYN/LONG	F		N		100	0.0		4	1
+Test Pupil 05 Alexander Montgomery-Sinclair	7SYN/LONG	M		N		100	0.0		3	1
+Test Pupil 04 Isabella Hamilton-Worthington	7SYN/LONG	F		Y		100	0.0		2	1
+Test Pupil 03 Alexander Montgomery-Sinclair	7SYN/LONG	M		N	Y	100	0.0		1	1
+Test Pupil 02 Isabella Hamilton-Worthington	7SYN/LONG	F	E	N		100	0.0		5	1
+Test Pupil 01 Alexander Montgomery-Sinclair	7SYN/LONG	M	K	N		100	0.0		4	1

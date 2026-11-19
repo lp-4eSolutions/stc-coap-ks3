@@ -34,10 +34,10 @@ function main(workbook: ExcelScript.Workbook) {
   // Compare every loaded record, including subject/selection. Invalid marks block readiness.
   // Dropdown edits leave the staged run intact: returning to its choice can recognise its output.
   const output = workbook.getTable("KS3_Merge_Final");
-  const hasCurrentSchema = output && output.getColumnByName("SelectionToken");
+  const hasCurrentSchema = output && output.getColumnByName("Reporting_Version") && output.getColumnByName("Prior_Attainment_Invalid");
   if (hasCurrentSchema) {
     // BEGIN READINESS FORMULA
-    paste.getRange("D2").setFormula('=IF(KS3_CurrentRun="","NOT READY",IF(KS3_SubjectSelection<>KS3_StagedSelection,"PROCESS REQUIRED",IFERROR(IF(AND(COUNTIF(KS3_Merge_Final[RunID],KS3_CurrentRun)>0,COUNTIF(KS3_Merge_Final[RunID],KS3_CurrentRun)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[SelectionToken],KS3_SubjectSelection)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[Subject],KS3_StagedSubject)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[Year_Group],KS3_StagedYear)=ROWS(KS3_Merge_Final[RunID])),IF(SUM(KS3_Merge_Final[Autumn_Invalid],KS3_Merge_Final[Spring_Invalid],KS3_Merge_Final[Summer_Invalid])>0,"CHECK INVALID MARKS","READY TO REVIEW: Year "&KS3_StagedYear&" "&KS3_StagedSubject&" / "&ROWS(KS3_Merge_Final[RunID])&" class(es)"),"REFRESH REQUIRED"),"REFRESH REQUIRED")))');
+    paste.getRange("D2").setFormula('=IF(KS3_CurrentRun="","NOT READY",IF(KS3_SubjectSelection<>KS3_StagedSelection,"PROCESS REQUIRED",IFERROR(IF(AND(COUNTIF(KS3_Merge_Final[RunID],KS3_CurrentRun)>0,COUNTIF(KS3_Merge_Final[Reporting_Version],"Percent-2026-11-19")=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[RunID],KS3_CurrentRun)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[SelectionToken],KS3_SubjectSelection)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[Subject],KS3_StagedSubject)=ROWS(KS3_Merge_Final[RunID]),COUNTIF(KS3_Merge_Final[Year_Group],KS3_StagedYear)=ROWS(KS3_Merge_Final[RunID])),IF(SUM(KS3_Merge_Final[Autumn_Invalid],KS3_Merge_Final[Spring_Invalid],KS3_Merge_Final[Summer_Invalid],KS3_Merge_Final[Autumn_Year_Invalid],KS3_Merge_Final[Spring_Year_Invalid],KS3_Merge_Final[Summer_Year_Invalid],KS3_Merge_Final[Prior_Attainment_Invalid])>0,"CHECK INVALID MARKS","READY TO REVIEW: Year "&KS3_StagedYear&" "&KS3_StagedSubject&" / "&ROWS(KS3_Merge_Final[RunID])&" class(es)"),"REFRESH REQUIRED"),"REFRESH REQUIRED")))');
     // END READINESS FORMULA
   }
   paste.getRange("A2").setValue(hasCurrentSchema

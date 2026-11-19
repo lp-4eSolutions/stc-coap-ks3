@@ -1,9 +1,16 @@
 Surname   Forename	Reg Group	SEN Status	Pupil Premium   Indicator	Admission No.	Class	UPN	Looked After	KS2 GPVS Scaled   Score Key Stage 2 Validated Result	KS2 Maths Scaled   Score Key Stage 2 Validated Result	KS2 Reading   Scaled Score Key Stage 2 Validated Result	Prior Attainment   Group	CAT 3 Non Verbal   Score	CAT 3 Quantitive   Score	CAT 3 Spatial   Score	CAT 3 Verbal   Score	CAT Mean Score	Reading Age	Spelling Age	Prior Attainment   Quintile	TECH End of Year   Quinti~2 Year 8	TECH Effort in   Class Au Year 9 Autumn	TECH Effort in   Hmwork Au Year 9 Autumn	TECH Behaviour Au   Year 9 Autumn	TECH Attainment   Y9 (%)~3 Year 9 Autumn	TECH Effort in   Class Sp Year 9 Spring	TECH Effort in   Hmwrk Sp Year 9 Spring	TECH Behaviour Sp   Year 9 Spring	TECH Attainment   Y9 (%)~2 Year 9 Spring	TECH Effort in   Class Su Year 9 Summer	TECH Effort in   Hmwrk Su Year 9 Summer	TECH Behaviour Su   Year 9 Summer	TECH Attainment   Y9 (%) Year 9 Summer	TECH End of Year   Exam% Year 9 Summer	TECH End of Year   Quintile Year 9
-Test Pupil 01	9REG/WRONG	K	Y		9SYN/A						5								5	5				1								3	5	5
-Test Pupil 02	9REG/WRONG	E	N		9SYN/A		Y				5								5	5				2									5	5
-Test Pupil 03	9REG/WRONG				9SYN/A						5								5	5				2								5	5	5
-Test Pupil 04	9REG/WRONG		?		9SYN/A						5								5	5				5									5	5
-Test Pupil 05	9REG/WRONG				9SYN/A						5								5	5													5	5
-Test Pupil 06	9REG/WRONG	K	Y		9SYN/B						5								5	5				4				3				2	5	5
-Test Pupil 07	9REG/WRONG		N		9SYN/B						5								5	5				4				3				2	5	5
-Test Pupil 08	9REG/WRONG		N								5								5	5				3				2				4	5	5
+Test Pupil 01	9REG/WRONG	K	Y		9SYN/A						5								1	5				0								100	99	5
+Test Pupil 02	9REG/WRONG	E	N		9SYN/A		Y				5								2	5				20								81	99	5
+Test Pupil 03	9REG/WRONG				9SYN/A						5								3	5				21								80	99	5
+Test Pupil 04	9REG/WRONG				9SYN/A						5								4	5				40								61	99	5
+Test Pupil 05	9REG/WRONG				9SYN/A						5								5	5				41								60	99	5
+Test Pupil 06	9REG/WRONG				9SYN/A						5								1	5				60								41	99	5
+Test Pupil 07	9REG/WRONG				9SYN/A						5								2	5				61								40	99	5
+Test Pupil 08	9REG/WRONG				9SYN/A						5								3	5				80								21	99	5
+Test Pupil 09	9REG/WRONG				9SYN/A						5								4	5				81								20	99	5
+Test Pupil 10	9REG/WRONG				9SYN/A						5								5	5				100								0	99	5
+Test Pupil 11	9REG/WRONG				9SYN/A						5									5													99	5
+Test Pupil 12	9REG/WRONG	K	Y		9SYN/B						5								5	5				1				0				21	99	5
+Test Pupil 13	9REG/WRONG		N		9SYN/B						5								1	5				 5 				100.0				40	99	5
+Test Pupil 14	9REG/WRONG				9SYN/B						5									5				6									99	5
+Test Pupil 15	9REG/WRONG										5									5													99	5

@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import ts from 'typescript';
 import { TaskUtils, DefaultSettings } from '@microsoft/powerquery-parser';
 import { Workbook, fixture, installed, read, script } from './support/workbook.mjs';
-import { config, expected, key, terms } from './support/reference.mjs';
+import { config, expected, key, terms, bands } from './support/reference.mjs';
 
 const process = script('process-pupil-data'), reset = script('reset');
-const counts = (row,term) => [1,2,3,4,5].map(q => row[`${term}_Q${q}`]);
+const counts = (row,term) => bands.map(([, ,suffix]) => row[`${term}_Band_${suffix}_Count`]);
+const near = (actual,want) => assert(Math.abs(actual-want)<1e-10,`${actual} != ${want}`);
 function refreshModel(book) { book.output = expected(book.raw(), book.cell('KS3_SubjectSelection'), book.cell('KS3_CurrentRun')); }
 function clearPaste(book) {
   const sheet = book.getWorksheet('Paste_SIMS'), used = sheet.getUsedRange();
@@ -35,37 +36,41 @@ for (const layout of config.layouts) {
       book.cell('KS3_SubjectSelection',choice); book.paste(grid); process(book);
       assert.equal(book.cell('KS3_StagedYear'),layout.year);
       assert.equal(book.cell('KS3_StagedSubject'),subject.subject);
-      assert.deepEqual(book.raw(),grid.map(row => row.map((value,i) => i < grid[0].length ? value.replace(/\u00a0/g,' ').trim() : value)));
+      assert.deepEqual(book.raw(),grid.map((row,r) => r===0 ? row.map(value => value.replace(/\u00a0/g,' ').trim()) : row));
       assert.equal(book.ready(),'REFRESH REQUIRED');
       refreshModel(book);
       assert.equal(book.ready(),`READY TO REVIEW: Year ${layout.year} ${subject.subject} / 2 class(es)`);
       const [a,b] = book.output;
       assert.equal(a.Subject_Class,`${subject.subject} / ${layout.year}SYN/A`);
-      assert.equal(a.Pupils,5); assert.equal(b.Pupils,2); assert.equal(a.Rows_Without_Class,1);
+      assert.equal(a.Pupils,11); assert.equal(b.Pupils,3); assert.equal(a.Rows_Without_Class,1);
       assert.equal(a.SEND_K_List,'Test Pupil 01'); assert.equal(a.EHCP_List,'Test Pupil 02');
-      assert.equal(b.SEND_K_List,'Test Pupil 06');
-      if (layout.id === 'year-9-science') {
-        const quintiles = {Biology:[1,2,3],Physics:[2,3,4],Chemistry:[5,4,1]}[subject.subject];
-        terms.forEach((term,t) => {
-          assert.equal(a[term+'_Assessed'],4);
-          assert.deepEqual(counts(a,term),[1,2,3,4,5].map(q => q === quintiles[t] ? 4 : 0));
-          assert.equal(b[term+'_Assessed'],2);
-          assert.deepEqual(counts(b,term),[1,2,3,4,5].map(q => q === quintiles[t] ? 2 : 0));
-        });
-      } else {
-        assert.deepEqual(counts(a,'Autumn'),[1,2,0,0,1]);
-        assert.equal(a.Spring_Assessed,0);
-        assert.deepEqual(counts(a,'Summer'),[0,0,1,0,1]);
-        assert.deepEqual(counts(b,'Summer'),[0,2,0,0,0]);
+      assert.equal(b.SEND_K_List,'Test Pupil 12');
+      assert.equal(a.Prior_Q1_List,'Test Pupil 01\nTest Pupil 06');
+      assert.equal(a.Prior_Q5_List,'Test Pupil 05\nTest Pupil 10');
+      assert.equal(a.Prior_Attainment_Unassessed,1);
+      const chemistry = subject.subject === 'Chemistry', physics = subject.subject === 'Physics';
+      const average = chemistry ? 25 : physics ? 49.6 : 50.4;
+      near(a.Autumn_Class_Average,average); near(a.Summer_Class_Average,average);
+      assert.equal(a.Autumn_Assessed,10); assert.equal(a.Spring_Assessed,0); assert.equal(a.Spring_Class_Average,null);
+      assert.deepEqual(counts(a,'Autumn'),chemistry ? [0,0,1,4,5] : physics ? [1,2,2,2,3] : [2,2,2,2,2]);
+      assert.equal(a.Autumn_Invalid,0); assert.equal(a.Autumn_Year_Assessed,13);
+      near(b.Autumn_Class_Average,chemistry ? 5/3 : physics ? 96 : 4);
+      near(a.Autumn_Year_Average,chemistry ? 255/13 : physics ? 784/13 : 516/13);
+      assert.equal(a.Autumn_Year_Average,b.Autumn_Year_Average);
+      near(a.Spring_Year_Average,chemistry ? 25 : 50);
+      if (!chemistry && !physics) {
+        assert.equal(a.Autumn_Band_81_100_List,'Test Pupil 09\nTest Pupil 10');
+        assert.equal(a.Autumn_Band_0_20_List,'Test Pupil 01\nTest Pupil 02');
+        near(a.Summer_Year_Average,565/12);
       }
       if (layout.id === 'year-7-art') {
-        assert.equal(a.LAC_Column_Status,'Unavailable'); assert.equal(a.LAC_Unknown,5);
+        assert.equal(a.LAC_Column_Status,'Unavailable'); assert.equal(a.LAC_Unknown,11);
       } else { assert.equal(a.LAC_List,'Test Pupil 02'); assert.equal(a.LAC_Unknown,0); }
       if (['year-7-art','year-8-french','year-8-maths','year-9-dt','year-9-science'].includes(layout.id)) {
-        assert.equal(a.Sex_Unclassified,5); assert.equal(a.Boys_List,'');
+        assert.equal(a.Sex_Unclassified,11); assert.equal(a.Boys_List,'');
       } else {
-        assert.equal(a.Boys_List,'Test Pupil 01\nTest Pupil 04');
-        assert.equal(a.Girls_List,'Test Pupil 02\nTest Pupil 03');
+        assert.equal(a.Boys_List,'Test Pupil 01\nTest Pupil 03\nTest Pupil 05\nTest Pupil 07\nTest Pupil 09');
+        assert.equal(a.Girls_List,'Test Pupil 02\nTest Pupil 04\nTest Pupil 06\nTest Pupil 08\nTest Pupil 10');
       }
     });
   }
@@ -130,7 +135,7 @@ test('a failed or cancelled refresh retains old rows but cannot mark the new run
 });
 test('ready formula rejects mixed run IDs, wrong subjects, wrong years and invalid marks', () => {
   const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
-  for (const [field,bad] of [['RunID','old-run'],['SelectionToken','Biology'],['Subject','Art'],['Year_Group',8]]) {
+  for (const [field,bad] of [['RunID','old-run'],['SelectionToken','Biology'],['Subject','Art'],['Year_Group',8],['Reporting_Version','old-quintiles']]) {
     const value = book.output[1][field]; book.output[1][field] = bad;
     assert.equal(book.ready(),'REFRESH REQUIRED',field); book.output[1][field] = value;
   }
@@ -138,12 +143,13 @@ test('ready formula rejects mixed run IDs, wrong subjects, wrong years and inval
 });
 
 test('Year 7 Science Summer ignores separate exam and both prior/end-of-year quintiles', () => {
-  const grid = fixture('year-7-science'), indices = grid[0].flatMap((h,i) => /End of Year|Prior Attainment/.test(h) ? [i] : []);
-  assert.equal(indices.length,4);
+  const grid = fixture('year-7-science'), indices = grid[0].flatMap((h,i) => /End of Year|Prior Attainment Qiunti E/.test(h) ? [i] : []);
+  assert.equal(indices.length,3);
   const first = expected(grid);
   for (const row of grid.slice(1)) for (const i of indices) row[i] = '1';
   assert.deepEqual(expected(grid),first);
-  assert.deepEqual(counts(first[0],'Summer'),[0,0,1,0,1]);
+  assert.deepEqual(counts(first[0],'Summer'),[2,2,2,2,2]);
+  near(first[0].Summer_Class_Average,50.4);
 });
 
 test('reordered headers, NBSP/spacing and the two retained English aliases resolve', () => {
@@ -154,7 +160,7 @@ test('reordered headers, NBSP/spacing and the two retained English aliases resol
   }
   const book = installed(); book.paste(grid); process(book);
   assert.equal(book.cell('KS3_StagedSubject'),'English');
-  assert.deepEqual(counts(expected(book.raw())[0],'Autumn'),[1,2,0,0,1]);
+  assert.deepEqual(counts(expected(book.raw())[0],'Autumn'),[2,2,2,2,2]);
 });
 
 const invalidHeaders = [
@@ -208,20 +214,23 @@ test('formula-looking pupil text is staged literally', () => {
   names.forEach((name,i) => { grid[i+1][0] = name; });
   book.paste(grid); process(book); assert.deepEqual(book.raw().slice(1,6).map(r => r[0]),names);
 });
-test('independent oracle: invalid marks, unknown flags, refreshed Art, shared names and full long lists', () => {
-  const grid = fixture('year-7-english'), autumn = grid[0].findIndex(h => /Autumn/.test(h));
-  [' 2 ',6,'2.0','absent',true].forEach((v,i) => { grid[i+1][autumn] = v; });
-  const [a] = expected(grid); assert.equal(a.Autumn_Assessed,1); assert.equal(a.Autumn_Q2,1); assert.equal(a.Autumn_Invalid,4);
-  assert.equal(a.PP_Unknown,3); assert.equal(a.LAC_Unknown,0);
+test('profile lists, refreshed Art, shared names and complete long lists remain unchanged', () => {
+  const grid = fixture('year-7-english'), [a] = expected(grid);
+  assert.equal(a.PP_Unknown,9); assert.equal(a.LAC_Unknown,0);
   const art = fixture('year-7-art').map((row,i) => [...row,i === 0 ? 'Sex' : i % 2 ? 'F' : 'M',i === 0 ? 'Looked After' : i === 2 ? 'Y' : '']);
   const artA = expected(art)[0]; assert.equal(artA.Sex_Unclassified,0); assert.equal(artA.LAC_List,'Test Pupil 02');
-  const sameNames = fixture('year-7-english'); sameNames[4][0] = sameNames[1][0];
-  assert.equal(expected(sameNames)[0].Boys_List,'Test Pupil 01\nTest Pupil 01');
+  const sameNames = fixture('year-7-english'); sameNames[3][0] = sameNames[1][0];
+  assert.equal(expected(sameNames)[0].Boys_List.split('\n').filter(n => n === 'Test Pupil 01').length,2);
   const [long] = expected(fixture('year-7-english-32-pupils'));
-  for (const [field,count] of Object.entries({SEND_K_List:4,EHCP_List:4,Boys_List:16,Girls_List:16,PP_List:8,LAC_List:2})) {
+  for (const [field,count] of Object.entries({SEND_K_List:4,EHCP_List:4,Boys_List:16,Girls_List:16,PP_List:8,LAC_List:2,
+      Prior_Q1_List:32,Autumn_Band_81_100_List:32,Spring_Band_0_20_List:32})) {
     assert.equal(long[field].split('\n').length,count); assert.deepEqual(long[field].split('\n'),long[field].split('\n').sort());
   }
   assert.equal(long.Boys_List.length,703); assert.equal(long.Girls_List.length,703); assert.equal(long.PP_List.length,351);
+  assert.equal(long.Prior_Q1_List.length,1407); assert.equal(long.Autumn_Band_81_100_List.length,1407);
+  assert.equal(long.Autumn_Class_Average,100); assert.equal(long.Spring_Class_Average,0);
+  assert.equal(long.Summer_Class_Average,null); assert.equal(long.Summer_Year_Average,null);
+  assert.equal(long.Prior_Q2_List,''); assert.equal(long.Summer_Band_0_20_List,'');
 });
 test('in-place upgrade preserves tables, query source and paste; it can be repeated', () => {
   const book = installed(); book.paste(fixture('year-7-english')); process(book); refreshModel(book);
@@ -307,5 +316,5 @@ test('restaging changed Biology marks prevents away/back from recognising the ol
   book.cell('KS3_SubjectSelection','Physics'); assert.equal(book.ready(),'PROCESS REQUIRED');
   book.cell('KS3_SubjectSelection','Biology'); assert.equal(book.ready(),'REFRESH REQUIRED');
   refreshModel(book); assert.match(book.ready(),/Year 9 Biology/);
-  assert.deepEqual(counts(book.output[0],'Summer'),[0,0,3,0,1]);
+  assert.deepEqual(counts(book.output[0],'Summer'),[1,2,2,2,3]);
 });

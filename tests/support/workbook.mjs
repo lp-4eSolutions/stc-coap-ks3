@@ -130,6 +130,6 @@ export class Workbook {
 export function installed() {
   const book = new Workbook(); script('setup-pilot')(book);
   // Stand in for the current loaded query schema; no M evaluation takes place here.
-  book.tables.set('KS3_Merge_Final', { getColumnByName: name => name === 'SelectionToken' ? {} : undefined });
+  book.tables.set('KS3_Merge_Final', { getColumnByName: name => ['SelectionToken','Reporting_Version','Prior_Attainment_Invalid'].includes(name) ? {} : undefined });
   script('upgrade-pilot')(book); return book;
 }

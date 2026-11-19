@@ -1,9 +1,16 @@
 Surname   Forename	Class	Pupil Premium   Indicator	SEN Status	Looked After	KS2 Reading   Scaled Score Key Stage 2 Validated Result	KS2 Maths Scaled   Score Key Stage 2 Validated Result	KS2 GPVS Scaled   Score Key Stage 2 Validated Result	Prior Attainment   Group	CAT 3 Non Verbal   Score	CAT 3 Quantitive   Score	CAT 3 Spatial   Score	CAT 3 Verbal   Score	CAT Mean Score	Reading Age	Spelling Age	Prior Attainment   Qiuntine	SC End of Year   Quintile Year 8	BI Effort in   Class Au Year 9 Autumn	BI Effort in   Homework Au Year 9 Autumn	BI Behaviour Au   Year 9 Autumn	BI Attainment Y9   (%) Year 9 Autumn	CH Effort in   Class Au Year 9 Autumn	CH Effort in   Homework Au Year 9 Autumn	CH Behaviour Au   Year 9 Autumn	CH Attainment Y9   (%) Year 9 Autumn	PH Effort in   Class Au Year 9 Autumn	PH Effort in   Homework Au Year 9 Autumn	PH Behaviour Au   Year 9 Autumn	PH Attainment Y9   (%) Year 9 Autumn	BI Effort in   Class Sp Year 9 Spring	BI Effort in   Homework Sp Year 9 Spring	BI BGAR Effort   Homework S Year 9 Spring	BI Behaviour Sp   Year 9 Spring	BI Attainment Y9   (%) Sp Year 9 Spring	CH Effort in   Class Sp Year 9 Spring	CH Effort in   Homework Sp Year 9 Spring	CH Behaviour Sp   Year 9 Spring	CH Attainment Y9   (%) Sp Year 9 Spring	PH Effort in   Class Sp Year 9 Spring	PH Effort in   HomeworkSp Year 9 Spring	PH Behaviour Sp   Year 9 Spring	PH Attainment Y9   (%) Sp Year 9 Spring	BI Effort in   Class Su Year 9 Summer	BI Effort in   Homework Su Year 9 Summer	BI Behaviour Su   Year 9 Summer	BI Attainment Y9   (%)~3 Year 9 Summer	BI End of Year   Exam% Year 9 Summer	BI End of Year   Quintile Year 9	CH Effort in   Class Su Year 9 Summer	CH Effort in   Homework Su Year 9 Summer	CH Behaviour Su   Year 9 Summer	CH Attainment Y9   (%)~3 Year 9 Summer	CH End of Year   Exam% Year 9 Summer	CH End of Year   Quintile Year 9	PH Effort in   Class Su Year 9 Summer	PH Effort in   Homework Su Year 9 Summer	PH Behaviour Su   Year 9 Summer	PH Attainment Y9   (%)~3 Year 9 Summer	PH End of Year   Exam% Year 9 Summer	PH End of Year   Quintile Year 9
-Test Pupil 01	9SYN/A	Y	K					5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 02	9SYN/A	N	E	Y				5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 03	9SYN/A	N						5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 04	9SYN/A	N						5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 05	9SYN/A	N						5								5	5																														5	5					5	5					5	5
-Test Pupil 06	9SYN/B	Y	K					5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 07	9SYN/B	N						5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
-Test Pupil 08		N						5								5	5				1				5				2					2				4				3				3	5	5				1	5	5				4	5	5
+Test Pupil 01	9SYN/A	Y	K					5								1	5				0				0				100																	100	99	5				50	99	5				0	99	5
+Test Pupil 02	9SYN/A	N	E	Y				5								2	5				20				10				80																	81	99	5				40	99	5				19	99	5
+Test Pupil 03	9SYN/A							5								3	5				21				10				79																	80	99	5				40	99	5				20	99	5
+Test Pupil 04	9SYN/A							5								4	5				40				20				60																	61	99	5				30	99	5				39	99	5
+Test Pupil 05	9SYN/A							5								5	5				41				20				59																	60	99	5				30	99	5				40	99	5
+Test Pupil 06	9SYN/A							5								1	5				60				30				40																	41	99	5				20	99	5				59	99	5
+Test Pupil 07	9SYN/A							5								2	5				61				30				39																	40	99	5				20	99	5				60	99	5
+Test Pupil 08	9SYN/A							5								3	5				80				40				20																	21	99	5				10	99	5				79	99	5
+Test Pupil 09	9SYN/A							5								4	5				81				40				19																	20	99	5				10	99	5				80	99	5
+Test Pupil 10	9SYN/A							5								5	5				100				50				0																	0	99	5				0	99	5				100	99	5
+Test Pupil 11	9SYN/A							5									5																														99	5					99	5					99	5
+Test Pupil 12	9SYN/B	Y	K					5								5	5				1				0				99					0				0				100				21	99	5				10	99	5				79	99	5
+Test Pupil 13	9SYN/B	N						5								1	5				 5 				2				95					100.0				50				0				40	99	5				20	99	5				60	99	5
+Test Pupil 14	9SYN/B							5									5				6				3				94																		99	5					99	5					99	5
+Test Pupil 15								5									5																														99	5					99	5					99	5

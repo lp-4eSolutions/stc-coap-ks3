@@ -41,6 +41,14 @@
       [
         "Looked After"
       ]
+    ],
+    [
+      "PriorAttainment",
+      true,
+      [
+        "Prior Attainment Quintile",
+        "Prior Attainment Qiuntine"
+      ]
     ]
   ],
   "layouts": [
