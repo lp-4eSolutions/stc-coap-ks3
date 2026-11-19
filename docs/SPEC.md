@@ -7,12 +7,12 @@
 | Platform | A separate KS3 Excel workbook, Power Query, Office Scripts and desktop Word mail merge. |
 | Operator screen | Follow the KS4 layout with the `Paste_SIMS` sheet, A3 paste point, Help, Process Pupil Data, Reset and clear status feedback. |
 | Run scope | One year group and one subject per run. Produce one report record per teaching class for the selected subject. |
-| Attainment | Current-year Autumn, Spring and Summer results are quintiles from 1 to 5, with 1 highest. Several current SIMS headings mention percentages or exams. Preserve the source headings and bind them to the correct term. |
+| Attainment | Prior attainment uses baseline quintile groups 1–5, with 1 highest. The term result columns feeding the percentage sections contain marks out of 100. Preserve the source headings and bind the correct subject, year and term. |
 | Science, Years 7 and 8 | One Science report run per year group. Both supplied exports have one Science results column per term. |
 | Science, Year 9 | One SIMS export contains Biology, Physics and Chemistry. Process that same export in three separate runs, one per subject, with its own term bindings and report records. |
 | Sex and teacher | `Sex` has been added to all relevant SIMS marksheets. The class teacher completes the teacher field on the issued Word document. |
 | LAC | A blank value in the `Looked After` column means No. The Art marksheet now includes `Looked After`. |
-| Word layout | Use the supplied template. Preserve its headings, including the percentage-band labels. Agree what the band and average cells represent before binding them to live merge fields. |
+| Word layout | Use the updated template supplied on 19 November 2026. The five top named groups are prior-attainment quintiles. Each term's percentage bands run from high to low, left to right: `100% – 81%`, `80% – 61%`, `60% – 41%`, `40% – 21%`, `20% – 0%`. Confirm the band-cell contents and average definitions before binding those fields. |
 
 ### Science term headers
 
@@ -35,7 +35,7 @@ Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam%
 ## Input and output behaviour
 
 - Resolve Year 9 Science marks by selected subject and term. A missing or ambiguous required header produces a clear validation message and prevents a ready output. Header aliases cover observed spacing, spelling and duplicate suffix variations.
-- A valid mark is an integer from 1 to 5, including the equivalent text form after trimming. A blank is unassessed. Flag out-of-range values or unexpected text for correction. Count only valid marks in the relevant class, subject and term. Keep the assessed count alongside the five counts so a genuinely unassessed term can be recognised.
+- Validate prior-attainment quintiles as integers from 1 to 5. Validate term percentage marks on the 0–100 scale, including equivalent numeric text after trimming. A blank term mark is unassessed; a genuine zero is assessed. Flag out-of-range values or unexpected text for correction. Use the actual percentage for the selected subject and term when building the percentage bands, independently of prior-attainment quintile. Confirm decimal boundary handling before binding the band fields.
 - Use the same-year term field. Keep the separate end-of-year exam and prior-year quintile available as distinct inputs where present. Their use in reporting depends on an agreed field definition.
 - Use the pupil names supplied by SIMS for approved name lists. Use stable identifiers for duplicate diagnostics where available. Keep distinct pupils who share the same name and avoid joining different subjects' exports for release 1.
 - Keep SEND K and EHCP distinct. Use the supplied `Sex` values for the Boys and Girls groups and surface blanks or unexpected values as unclassified. For LAC, treat a blank cell in a present `Looked After` column as No. If the column is missing, report LAC as unavailable. Handle blank or missing PP without a refresh error and preserve it as unknown until the PP convention is confirmed.
@@ -45,10 +45,10 @@ Bind the Summer result to the term column. In Year 7, keep `SC End of Year Exam%
 
 | Decision | Working position |
 | --- | --- |
-| Five named quintile lists at the top | Candidate source is Prior Attainment Quintile. Confirm before binding those fields. |
-| Percentage-band cells | Ask what the original labels are intended to describe and what goes in each cell. Calculate Q1–Q5 counts in Excel for verification. Leave these Word cells unbound until the intended mapping is confirmed. |
-| Class average and year average | Confirm what they should measure with quintile inputs. If a mean quintile is wanted, use valid pupil results and weight the year figure by pupil, with the intended subject cohort confirmed. A partial export cannot stand in for the full cohort. |
+| Five named quintile lists at the top | Confirmed source is Prior Attainment Quintile, including the observed Science spelling alias `Prior Attainment Qiuntine`. List pupils in baseline groups Q1–Q5, one pupil per line. |
+| Percentage-band cells | Confirmed source is the corresponding term's percentage mark out of 100. Use the updated descending band order. Confirm whether each cell contains pupil names or pupil counts, and how decimal marks at band boundaries should be handled. |
+| Class average and year average | Proposed definition is mean percentage for that term. Confirm before binding. Include valid zero marks and exclude unassessed blanks. Weight the year figure by pupil and confirm the intended subject cohort; a partial export cannot stand in for the full cohort. |
 | Flag codes | Check the populated LAC codes and the PP flag convention against the standard SIMS export. |
 | Intervention and evaluation boxes | Use teacher entry for the initial release unless there is an agreed automated field definition. |
 
-These decisions allow development of the import, validation, class profile, internal quintile counts and initial Word pilot with confirmed fields. Resolve any fields required for the first live report before binding and releasing that report.
+The existing implementation and synthetic fixtures treat term results as quintiles 1–5. Revise their term calculations and expected results for the confirmed percentage inputs. Existing import, subject-selection, class-profile and Word-list checks remain relevant. Resolve the outstanding field definitions before binding and releasing the first live report.
