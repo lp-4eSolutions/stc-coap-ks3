@@ -1,9 +1,16 @@
-Surname Forename	Class	Sex	SEN Status	Pupil Premium Indicator	Looked After	EN  Attainment Y7 (%) Year 7 Autumn	EN  Attainment Y7 (%)~2 Year 7 Spring	EN Attainment Y7 (%)Su Year 7 Summer	EN End of Year Exam% Year 7 Summer
-Test Pupil 01	7SYN/A	M	K	Y		1		3	5
-Test Pupil 02	7SYN/A	F	E	N	Y	2			5
-Test Pupil 03	7SYN/A	F				2		5	4
-Test Pupil 04	7SYN/A	M				5			4
-Test Pupil 05	7SYN/A								5
-Test Pupil 06	7SYN/B	F	K	Y		4	1	2	5
-Test Pupil 07	7SYN/B	M		N		4	3	2	4
-Test Pupil 08		M				1
+Surname Forename	Class	Sex	SEN Status	Pupil Premium Indicator	Looked After	EN  Attainment Y7 (%) Year 7 Autumn	EN  Attainment Y7 (%)~2 Year 7 Spring	EN Attainment Y7 (%)Su Year 7 Summer	EN End of Year Exam% Year 7 Summer	Prior Attainment Quintile
+Test Pupil 01	7SYN/A	M	K	Y		0		100	99	1
+Test Pupil 02	7SYN/A	F	E	N	Y	20		81	99	2
+Test Pupil 03	7SYN/A	M				21		80	99	3
+Test Pupil 04	7SYN/A	F				40		61	99	4
+Test Pupil 05	7SYN/A	M				41		60	99	5
+Test Pupil 06	7SYN/A	F				60		41	99	1
+Test Pupil 07	7SYN/A	M				61		40	99	2
+Test Pupil 08	7SYN/A	F				80		21	99	3
+Test Pupil 09	7SYN/A	M				81		20	99	4
+Test Pupil 10	7SYN/A	F				100		0	99	5
+Test Pupil 11	7SYN/A								99	
+Test Pupil 12	7SYN/B	F	K	Y		1	0	21	99	5
+Test Pupil 13	7SYN/B	M		N		 5 	100.0	40	99	1
+Test Pupil 14	7SYN/B					6			99	
+Test Pupil 15									99	

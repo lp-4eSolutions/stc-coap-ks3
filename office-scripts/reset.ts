@@ -5,6 +5,7 @@ function main(workbook: ExcelScript.Workbook) {
   const status = paste.getRange("A2");
 
   currentRun.clear(ExcelScript.ClearApplyTo.contents);
+  workbook.getApplication().calculate(ExcelScript.CalculationType.full);
   status.setValue("Resetting…");
   const used = paste.getUsedRange(true);
   if (used) {
@@ -29,6 +30,11 @@ function main(workbook: ExcelScript.Workbook) {
     raw.getRangeByIndexes(0, 2, 2, columns - 2).clear(ExcelScript.ClearApplyTo.contents);
   }
 
+  for (const name of ["KS3_StagedSelection", "KS3_StagedSubject", "KS3_StagedYear"]) {
+    workbook.getNamedItem(name).getRange().clear(ExcelScript.ClearApplyTo.contents);
+  }
+  workbook.getNamedItem("KS3_SubjectSelection").getRange().setValue("Auto");
+  workbook.getApplication().calculate(ExcelScript.CalculationType.full);
   paste.getRange("A3").setValue("Paste SIMS export here");
   status.setValue("Paste the SIMS export into A3, then run Process Pupil Data.");
 }

@@ -1,81 +1,26 @@
-# Year 7 English pilot
+# Year 7 English pilot record
 
-## Install in a blank school workbook
+The original pilot established the single-workbook A3 → Process → `KS3_Merge_Final` → desktop Word workflow and the seven profile fields. It used term quintiles 1–5. On 19 November, the confirmed definition changed term reporting to whole-number percentages; current fixtures and instructions now use those confirmed definitions.
 
-1. In desktop Excel, create and save a blank workbook for the synthetic pilot. In **Automate**, create an Office Script from [Setup Pilot](../office-scripts/setup-pilot.ts) and run it once. It creates the paste sheet, the input table and the run ID cell.
-2. Create three more Office Scripts from [Process Pupil Data](../office-scripts/process-pupil-data.ts), [Reset](../office-scripts/reset.ts) and [Help](../office-scripts/help.ts). Associate them with the workbook and add their buttons to the top of `Paste_SIMS` if available on your school account. You can also run them from the Automate tab.
-3. In **Data → Get Data → From Other Sources → Blank Query**, open Advanced Editor and paste [KS3_Merge_Final.pq](../power-query/KS3_Merge_Final.pq). Name the query `KS3_Merge_Final` and load it to a new worksheet as a table. Check the Excel table name in **Table Design** and set it to `KS3_Merge_Final` if needed. The first load should contain only headers.
-4. Paste the following Excel formula into `Paste_SIMS!D2`. It compares the current staging ID with the loaded query records.
+Use the [current in-place upgrade and operating instructions](REMAINING_LAYOUTS.md), [19 November field manifest](WORD_FIELDS.md) and [revised expected results](TEST_EVIDENCE.md). The historical installation formula and term-quintile expectations have been superseded; the commit history retains that pilot source/evidence.
 
-   ```excel
-   =IF(B2="","NOT READY",IFERROR(IF(AND(COUNTIF(KS3_Merge_Final[RunID],B2)>0,COUNTIF(KS3_Merge_Final[RunID],B2)=ROWS(KS3_Merge_Final[RunID])),"READY TO REVIEW","REFRESH REQUIRED"),"REFRESH REQUIRED"))
-   ```
+## Retained profile and Word evidence
 
-## Run the pilot
+The operator initially saw `0` for some name fields. The original cause remained unconfirmed; supplied synthetic workbook inspection found equivalent saved name strings and ACE reader options. After a clean source repeat, the operator confirmed full profile lists using `KS3_Merge_Final` directly. Retain the direct query source and keep diagnostic formulas off its merge worksheet.
 
-1. Copy the full grid of the [synthetic export](../tests/year-7-english.tsv), including headings, into `Paste_SIMS!A3`. If the TSV opens as one column, open it in Excel as a tab-delimited file first. Run **Process Pupil Data** and look for **REFRESH REQUIRED**.
-2. In **Queries & Connections**, refresh **KS3_Merge_Final** and wait for successful completion. Use **READY TO REVIEW** and compare the output against the expected results below. `Rows_Without_Class` is a run total repeated on each class row. Keep the merge worksheet limited to headers and current query records; put `LEN` formulas and other diagnostics on a separate worksheet.
-3. Check that every output row's `RunID` matches `Paste_SIMS!B2`, then save and close the workbook. In desktop Word, open a local working copy of the supplied template. Under **Mailings → Select Recipients → Use an Existing List**, select the correct saved workbook and the `KS3_Merge_Final` worksheet/table. Check the recipient list before merging: it must contain exactly the current class records, with the complete name lists rather than `0`. Insert these fields into the corresponding blank cells while keeping the template headings as supplied.
+On 18 November 2026, the operator confirmed the C2 dropdown behaviour: a different selection requires Process, returning to the unchanged staged choice recognises its valid output, and starting a new Process prevents the previous output from being accepted. On 19 November, the operator supplied the earlier long/two-class English outputs and Word profiles, and confirmed no previous recipients after Reset, successful refresh and save. These checks precede the new reporting implementation and are not native acceptance of its additional fields.
 
-   | Word cell | Field |
-   | --- | --- |
-   | Subject / class | `Subject_Class` |
-   | SEND K | `SEND_K_List` |
-   | EHCP | `EHCP_List` |
-   | Boys | `Boys_List` |
-   | Girls | `Girls_List` |
-   | PP | `PP_List` |
-   | LAC | `LAC_List` |
+The [32-pupil fixture](../tests/year-7-english-32-pupils.tsv) retains the exact long profile names: 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP and 2 LAC. Boys and Girls each have 703 characters including line feeds, PP 351. The revised fixture also has three new lists of 32 names/1,407 characters: prior Q1, Autumn's highest percentage band and Spring's lowest percentage band. Autumn means are 100, Spring means 0 and Summer means blank.
 
-   The teacher, top quintile lists, percentage bands, averages and intervention/evaluation boxes can remain blank for this pilot.
+## Repeat sequence on the current source
 
-4. In desktop Word, preview both records (`7SYN/A` and `7SYN/B`), then choose **Finish & Merge → Edit Individual Documents** for both. Check all six list fields against the expected results below: every name must appear in full, sorted, with one pupil per line inside the appropriate cell, including both Boys and Girls names in class A. Check that blank lists remain blank, no names cross between classes, and the supplied template headings are unchanged. Inspect both merged records at the intended paper size and record the page count. Multiple pages and rows continuing across pages are acceptable when all names remain visible; clipped or missing text is a failure. Close Word before resetting or changing the source. After a failed or cancelled refresh, complete a successful current refresh before merging.
-
-## Expected results
-
-SEND K, EHCP, Boys, Girls, PP and LAC all use the shared `NameList` helper. It sorts pupil names and joins them with a line feed (`#(lf)`), matching KS4. The line breaks shown in the table below mean one pupil per line in the merged Word cell.
-
-| Check | 7SYN/A | 7SYN/B |
+| Stage | Fixture | Expected Word recipients |
 | --- | --- | --- |
-| Pupil count | 5 | 2 |
-| Autumn assessed | 4 | 2 |
-| Autumn Q1–Q5 | 1, 2, 0, 0, 1 | 0, 0, 0, 2, 0 |
-| Spring assessed | 0 | 2 |
-| Summer Q1–Q5 | 0, 0, 1, 0, 1 | 0, 2, 0, 0, 0 |
-| SEND K | Test Pupil 01 | Test Pupil 06 |
-| EHCP | Test Pupil 02 | blank |
-| Boys | Test Pupil 01<br>Test Pupil 04 | Test Pupil 07 |
-| Girls | Test Pupil 02<br>Test Pupil 03 | Test Pupil 06 |
-| PP | Test Pupil 01 | Test Pupil 06 |
-| LAC | Test Pupil 02 | blank |
+| 1 | 32-pupil fixture | One: `7SYN/LONG`, 32 pupils |
+| 2 | Revised two-class fixture | Two: `7SYN/A` (11 pupils), `7SYN/B` (3 pupils); no LONG |
+| 3 | 32-pupil fixture again | One: `7SYN/LONG`; no A or B |
+| 4 | Reset, successfully refresh and save | No previous class recipients |
 
-Expect one row without a class, one unclassified sex and three unknown PP values in class A, and zero unknown LAC values for either class. Test Pupil 08 appears in neither record. The end-of-year exam values do not enter Summer counts.
+For each populated stage, close Word, Reset, paste at A3, choose Auto in C2, Process and successfully refresh. Check readiness, reporting version, current run ID, class count and the reference results; save/close Excel and explicitly reconnect the 19 November Word template to that saved workbook/source. Check all 33 mapped fields, full names including final names, correct blank cells and the supplied headings. Long names can wrap and reports may span pages; clipping, missing names, class leakage or `0` substituted in name lists fail acceptance. The [focused checklist](REMAINING_LAYOUTS.md#focused-desktop-word-acceptance--new-reporting-fields-pending) includes percentage means and independent prior/term groups.
 
-## Word repeat check — run locally in desktop Office
-
-The operator initially saw `0` for Boys, Girls and PP, then reported that all relevant fields merged correctly from the original KS3 workbook after removing the diagnostic row. Inspection of the supplied synthetic workbooks found identical saved name strings, including newlines, and equivalent cell types and wrapping. Both Word connections used ACE OLE DB 12.0 with `HDR=YES;IMEX=1`. The initial failure preceded the diagnostic row, so its original cause is unconfirmed. Retain the direct query output; a separate values-only merge sheet is not currently justified.
-
-Run this sequence on the operator's machine. Code checks and file inspection do not verify desktop Excel refresh or Word's ACE reader.
-
-| Stage | Source | Expected Word recipients |
-| --- | --- | --- |
-| 1 | [32-pupil fixture](../tests/year-7-english-32-pupils.tsv) | Exactly one: `7SYN/LONG`, 32 pupils |
-| 2 | [Original two-class fixture](../tests/year-7-english.tsv) | Exactly two: `7SYN/A` (5 pupils), `7SYN/B` (2 pupils); no LONG record |
-| 3 | 32-pupil fixture again | Exactly one: `7SYN/LONG`; no A or B records |
-| 4 | Reset, then successfully refresh and save | No previous class records; a no-recipient message is acceptable |
-
-For stages 1–3, close Word, run Reset, paste the fixture, Process, and successfully refresh the query. Verify **READY TO REVIEW**, the expected class count and a new `RunID` matching `Paste_SIMS!B2` on every output row. Save and close Excel, then explicitly reconnect Word to that saved workbook and the correct merge worksheet. In **Edit Recipient List**, check the exact recipients and full text of all six name lists before previewing and finishing the merge in the CoaP template. Every name must appear in full, sorted, starting on its own line; long names may wrap and reports may span multiple pages. Blank lists must stay blank. Check the final name in each list, not just the pupil count.
-
-The long fixture expects 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP and 2 LAC names. Its Boys and Girls strings are 703 characters each and PP is 351, including line feeds. If using Excel `LEN` to check these values, place those formulas on a separate diagnostics worksheet.
-
-Reset clears input and invalidates the run ID; it does not immediately remove previously loaded query rows. Stage 4 therefore requires a successful refresh with the cleared run ID, followed by saving and reconnecting Word. After any failed or cancelled Process/refresh, do not merge the old output. The readiness formula is an operator check, not a restriction enforced by Word.
-
-Record pass/fail for each stage, the run IDs and Excel/Word versions locally. The repeat sequence remains pending until the operator completes it. If `0` or truncated names recur, stop at that stage and retain the synthetic saved workbook and its Word source details for comparison before changing the query or adding another merge source.
-
-## Follow-up checks
-
-- For a longer-list desktop Word check, reset the pilot and paste the [32-pupil synthetic export](../tests/year-7-english-32-pupils.tsv) at `Paste_SIMS!A3`. Expect one class (`7SYN/LONG`) and 32 pupils. The six lists should contain 4 SEND K, 4 EHCP, 16 Boys, 16 Girls, 8 PP and 2 LAC names. The input runs from Test Pupil 32 to 01, so check that the output lists are in ascending order. Process, refresh, review and save, then preview and finish the merge in desktop Word at the intended paper size. Compare every full name with the source in all six list cells, one pupil per line, including the final name in each list. Multiple pages are acceptable; no names may be clipped, truncated or missing. Record the page count and any layout issue; keep the merge field names and supplied template headings unchanged.
-- Reset after a successful refresh. Check **NOT READY**, refresh to empty the query output, then stage only class B and verify that a new refresh returns one record.
-- Trigger a failed run by removing the Autumn heading and its whole column. The query should show a missing Autumn column message, and the previous run must not show as ready.
-- Change one valid mark to 6. The affected term's invalid count should increase by one and its assessed count should decrease by one. Remove the whole LAC column and verify the output reports **Unavailable**.
-- Record the Excel/Word versions and whether the merge succeeded. These steps are the native acceptance check for the pilot.
+Reset invalidates the run immediately but does not itself clear loaded query rows. Complete a successful blank-run refresh and save before reconnecting Word to check empty recipients. After any failed Process or refresh, complete a successful current run before merging. Native acceptance of the new reporting fields remains pending.

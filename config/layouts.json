@@ -1,0 +1,246 @@
+{
+  "profile": [
+    [
+      "Pupil",
+      true,
+      [
+        "Surname Forename"
+      ]
+    ],
+    [
+      "Class",
+      true,
+      [
+        "Class"
+      ]
+    ],
+    [
+      "SEN",
+      false,
+      [
+        "SEN Status"
+      ]
+    ],
+    [
+      "Sex",
+      false,
+      [
+        "Sex"
+      ]
+    ],
+    [
+      "PP",
+      false,
+      [
+        "Pupil Premium Indicator"
+      ]
+    ],
+    [
+      "LAC",
+      false,
+      [
+        "Looked After"
+      ]
+    ],
+    [
+      "PriorAttainment",
+      true,
+      [
+        "Prior Attainment Quintile",
+        "Prior Attainment Qiuntine"
+      ]
+    ]
+  ],
+  "layouts": [
+    {
+      "id": "year-7-art",
+      "year": 7,
+      "subjects": [
+        {
+          "subject": "Art",
+          "terms": [
+            [
+              "Art Attainment Yr7 (%) Year 7 Autumn"
+            ],
+            [
+              "AR AttainmentY7 (%) Sp Year 7 Spring"
+            ],
+            [
+              "AR Attainment Y7(%) Su Year 7 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-7-english",
+      "year": 7,
+      "subjects": [
+        {
+          "subject": "English",
+          "terms": [
+            [
+              "EN Attainment Y7 (%) Year 7 Autumn"
+            ],
+            [
+              "EN Attainment Y7 (%)~2 Year 7 Spring",
+              "EN Attainment Y7 (%) Year 7 Spring"
+            ],
+            [
+              "EN Attainment Y7 (%)Su Year 7 Summer",
+              "EN Attainment Y7 (%) Year 7 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-7-science",
+      "year": 7,
+      "subjects": [
+        {
+          "subject": "Science",
+          "terms": [
+            [
+              "SC Exam Y7 (%) Au Year 7 Autumn"
+            ],
+            [
+              "SC Exam Y7 (%) Sp Year 7 Spring"
+            ],
+            [
+              "SC Exam Y7 (%) Su Year 7 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-8-french",
+      "year": 8,
+      "subjects": [
+        {
+          "subject": "French",
+          "terms": [
+            [
+              "FR Attainment Y8 (%) Au Year 8 Autumn"
+            ],
+            [
+              "FR Attainment Y8 (%) Sp Year 8 Spring"
+            ],
+            [
+              "FR AttainmentY8 (%) Su Year 8 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-8-maths",
+      "year": 8,
+      "subjects": [
+        {
+          "subject": "Maths",
+          "terms": [
+            [
+              "MA Attainment Y8 (%)Au Year 8 Autumn"
+            ],
+            [
+              "MA Attainment Y8(%)Sp Year 8 Spring"
+            ],
+            [
+              "MA AttainmentY8 (%)Su Year 8 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-8-science",
+      "year": 8,
+      "subjects": [
+        {
+          "subject": "Science",
+          "terms": [
+            [
+              "SC Exam Y8 (%)~2 Year 8 Autumn"
+            ],
+            [
+              "SC Exam Y8 (%)~3 Year 8 Spring"
+            ],
+            [
+              "SC Exam Y8 (%)~4 Year 8 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-9-dt",
+      "year": 9,
+      "subjects": [
+        {
+          "subject": "DT",
+          "terms": [
+            [
+              "TECH Attainment Y9 (%)~3 Year 9 Autumn"
+            ],
+            [
+              "TECH Attainment Y9 (%)~2 Year 9 Spring"
+            ],
+            [
+              "TECH Attainment Y9 (%) Year 9 Summer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "year-9-science",
+      "year": 9,
+      "subjects": [
+        {
+          "subject": "Biology",
+          "terms": [
+            [
+              "BI Attainment Y9 (%) Year 9 Autumn"
+            ],
+            [
+              "BI Attainment Y9 (%) Sp Year 9 Spring"
+            ],
+            [
+              "BI Attainment Y9 (%)~3 Year 9 Summer"
+            ]
+          ]
+        },
+        {
+          "subject": "Physics",
+          "terms": [
+            [
+              "PH Attainment Y9 (%) Year 9 Autumn"
+            ],
+            [
+              "PH Attainment Y9 (%) Sp Year 9 Spring"
+            ],
+            [
+              "PH Attainment Y9 (%)~3 Year 9 Summer"
+            ]
+          ]
+        },
+        {
+          "subject": "Chemistry",
+          "terms": [
+            [
+              "CH Attainment Y9 (%) Year 9 Autumn"
+            ],
+            [
+              "CH Attainment Y9 (%) Sp Year 9 Spring"
+            ],
+            [
+              "CH Attainment Y9 (%)~3 Year 9 Summer"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

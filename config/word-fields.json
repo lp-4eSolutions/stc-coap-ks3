@@ -1,0 +1,203 @@
+{
+  "template_date": "2026-11-19",
+  "fields": [
+    {
+      "section": "Profile",
+      "heading": "Subject / class",
+      "field": "Subject_Class",
+      "kind": "text"
+    },
+    {
+      "section": "Profile",
+      "heading": "SEND K",
+      "field": "SEND_K_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Profile",
+      "heading": "EHCP",
+      "field": "EHCP_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Profile",
+      "heading": "Boys",
+      "field": "Boys_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Profile",
+      "heading": "Girls",
+      "field": "Girls_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Profile",
+      "heading": "PP",
+      "field": "PP_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Profile",
+      "heading": "LAC",
+      "field": "LAC_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Prior attainment",
+      "heading": "Q1",
+      "field": "Prior_Q1_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Prior attainment",
+      "heading": "Q2",
+      "field": "Prior_Q2_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Prior attainment",
+      "heading": "Q3",
+      "field": "Prior_Q3_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Prior attainment",
+      "heading": "Q4",
+      "field": "Prior_Q4_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Prior attainment",
+      "heading": "Q5",
+      "field": "Prior_Q5_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "100% – 81%",
+      "field": "Autumn_Band_81_100_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "80% – 61%",
+      "field": "Autumn_Band_61_80_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "60% – 41%",
+      "field": "Autumn_Band_41_60_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "40% – 21%",
+      "field": "Autumn_Band_21_40_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "20% – 0%",
+      "field": "Autumn_Band_0_20_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Autumn",
+      "heading": "Class average",
+      "field": "Autumn_Class_Average",
+      "kind": "mean-percentage"
+    },
+    {
+      "section": "Autumn",
+      "heading": "Year average",
+      "field": "Autumn_Year_Average",
+      "kind": "mean-percentage"
+    },
+    {
+      "section": "Spring",
+      "heading": "100% – 81%",
+      "field": "Spring_Band_81_100_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Spring",
+      "heading": "80% – 61%",
+      "field": "Spring_Band_61_80_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Spring",
+      "heading": "60% – 41%",
+      "field": "Spring_Band_41_60_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Spring",
+      "heading": "40% – 21%",
+      "field": "Spring_Band_21_40_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Spring",
+      "heading": "20% – 0%",
+      "field": "Spring_Band_0_20_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Spring",
+      "heading": "Class average",
+      "field": "Spring_Class_Average",
+      "kind": "mean-percentage"
+    },
+    {
+      "section": "Spring",
+      "heading": "Year average",
+      "field": "Spring_Year_Average",
+      "kind": "mean-percentage"
+    },
+    {
+      "section": "Summer",
+      "heading": "100% – 81%",
+      "field": "Summer_Band_81_100_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Summer",
+      "heading": "80% – 61%",
+      "field": "Summer_Band_61_80_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Summer",
+      "heading": "60% – 41%",
+      "field": "Summer_Band_41_60_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Summer",
+      "heading": "40% – 21%",
+      "field": "Summer_Band_21_40_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Summer",
+      "heading": "20% – 0%",
+      "field": "Summer_Band_0_20_List",
+      "kind": "name-list"
+    },
+    {
+      "section": "Summer",
+      "heading": "Class average",
+      "field": "Summer_Class_Average",
+      "kind": "mean-percentage"
+    },
+    {
+      "section": "Summer",
+      "heading": "Year average",
+      "field": "Summer_Year_Average",
+      "kind": "mean-percentage"
+    }
+  ]
+}
